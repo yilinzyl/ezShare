@@ -10,9 +10,9 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
+import { firestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/core";
 import logo from "../assets/ezShare-logo.png";
-import { HORIZONTAL } from "react-native/Libraries/Components/ScrollView/ScrollViewContext";
 
 // Variable width of current window 
 var width = Dimensions.get('window').width;
@@ -20,9 +20,12 @@ var width = Dimensions.get('window').width;
 // Variable height of current window
 var height = Dimensions.get('window').height;
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const [email, setEmail] = useState("");
+  const [name, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
+  const [cpassword, setCPassword] = useState("");
+  const [userData, setUserData] = useState("");
 
   const navigation = useNavigation();
 
@@ -35,27 +38,25 @@ const LoginScreen = () => {
     return unsubscribe;
   }, []);
 
-  const handleNewUser = () => {
-    navigation.replace("Register");
-  }
+  const handleExistingUser = () => {
+    navigation.replace("Log In");
+  };
 
   const handleRegister = () => {
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Registered with", user.email);
-      })
-      .catch((error) => alert(error.message));
-  };
-  const handleLogIn = () => {
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Logged in with", user.email);
-      })
-      .catch((error) => alert(error.message));
+    if (password === cpassword) {
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredentials) => {
+          const user = userCredentials.user;
+          console.log("Registered with", user.email);
+          return user.updateProfile({
+            displayName: name,
+          });
+        })
+        .catch((error) => alert(error.message));
+    } else {
+      alert("Password does not match. Please confirm password again.");
+    }
   };
 
   return (
@@ -67,8 +68,17 @@ const LoginScreen = () => {
         <Image source={logo} style={styles.appLogo} />
       </View>
       <KeyboardAvoidingView style={styles.roundedContainer} behavior="padding">
-        <Text style={styles.header}>Sign In</Text>
+        <Text style={styles.header}>Create an account</Text>
         <View style={styles.inputContainer}>
+          <Text style={styles.inputHeader}>Name</Text>
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={(text) => setDisplayName(text)}
+              style={styles.input}
+            />
+          </View>
           <Text style={styles.inputHeader}>Email</Text>
           <View style={styles.inputBox}>
             <TextInput
@@ -88,18 +98,31 @@ const LoginScreen = () => {
               secureTextEntry
             />
           </View>
+          <Text style={styles.inputHeader}>Confirm Password</Text>
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Password"
+              value={cpassword}
+              onChangeText={(text) => setCPassword(text)}
+              style={styles.input}
+              secureTextEntry
+            />
+          </View>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={handleLogIn} style={styles.signInButton}>
-            <Text style={styles.buttonText}>Sign In</Text>
-          </TouchableOpacity>
           <TouchableOpacity
-            onPress={handleNewUser}
+            onPress={handleRegister}
             style={styles.registerButton}
           >
-            <Text style={styles.registerText}>
-              Not a user yet? Create a new account.
-            </Text>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={handleExistingUser}
+            style={styles.existingUserButton}
+          >
+            <Text style={styles.existingUserText}>I am an existing User</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -107,7 +130,7 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   logoContainer: {
@@ -120,20 +143,20 @@ const styles = StyleSheet.create({
   },
   header: {
     fontFamily: "raleway-bold",
-    fontSize: 32,
+    fontSize: 30,
     color: "#404040",
     top: 42,
   },
   roundedContainer: {
     backgroundColor: "white",
-    top: height * 0.2,
+    top: height * 0.15,
     borderTopRightRadius: 50,
     borderTopLeftRadius: 50,
     alignItems: "center",
     flex: 1,
   },
   inputContainer: {
-    top: 80,
+    top: 70,
   },
   inputBox: {
     borderColor: "#B0C0F9",
@@ -155,10 +178,9 @@ const styles = StyleSheet.create({
     margin: 6,
   },
   buttonContainer: {
-    top: 120,
-    alignItems: "center",
+    top: 100,
   },
-  signInButton: {
+  registerButton: {
     backgroundColor: "#F898A3",
     height: 50,
     width: 217,
@@ -171,9 +193,9 @@ const styles = StyleSheet.create({
     color: "#F9FAFE",
     fontSize: 20,
   },
-  registerText: {
+  existingUserText: {
     fontFamily: "raleway-regular",
+    margin: 5,
     color: "#404040",
-    margin: 10,
   },
 });

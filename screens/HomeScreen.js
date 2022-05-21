@@ -1,9 +1,14 @@
-import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, KeyboardAvoidingView, TouchableOpacity, Dimensions } from "react-native";
 import React from "react";
 import { auth } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 
+// Variable width of current window 
+var width = Dimensions.get('window').width;
+
+// Variable height of current window
+var height = Dimensions.get('window').height;
 
 const HomeScreen = () => {
   const user = auth.currentUser;
@@ -12,7 +17,7 @@ const HomeScreen = () => {
     auth
     .signOut()
     .then(() => {
-      navigation.replace("Log In")
+      navigation.replace("Register")
     })
     .then(
       console.log("Signed out")
@@ -22,7 +27,7 @@ const HomeScreen = () => {
 
   return (
     <View>
-      <Text>Home Screen, {user.email} </Text>
+      <Text>Hello, {user.displayName}!</Text>
       <TouchableOpacity onPress={handleSignOut} style={styles.button}>
         <Text style={styles.buttonText}>Sign out</Text>
       </TouchableOpacity>
