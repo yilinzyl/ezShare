@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { firestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/core";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import logo from "../assets/ezShare-logo.png";
 
 // Variable width of current window 
@@ -60,73 +61,78 @@ const RegisterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
+    <View
       style={{ flex: 1, backgroundColor: "#B0C0F9" }}
-      behavior="padding"
     >
       <View style={styles.logoContainer}>
         <Image source={logo} style={styles.appLogo} />
       </View>
-      <KeyboardAvoidingView style={styles.roundedContainer} behavior="padding">
-        <Text style={styles.header}>Create an account</Text>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputHeader}>Name</Text>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Name"
-              value={name}
-              onChangeText={(text) => setDisplayName(text)}
-              style={styles.input}
-            />
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        // scrollEnabled={false}
+        contentContainerStyle={{flexGrow: 1}}
+      >
+        <View style={styles.roundedContainer}>
+          <Text style={styles.header}>Create an account</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputHeader}>Name</Text>
+            <View style={styles.inputBox}>
+              <TextInput
+                placeholder="Name"
+                value={name}
+                onChangeText={(text) => setDisplayName(text)}
+                style={styles.input}
+              />
+            </View>
+            <Text style={styles.inputHeader}>Email</Text>
+            <View style={styles.inputBox}>
+              <TextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                style={styles.input}
+              />
+            </View>
+            <Text style={styles.inputHeader}>Password</Text>
+            <View style={styles.inputBox}>
+              <TextInput
+                placeholder="Password"
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                style={styles.input}
+                secureTextEntry
+              />
+            </View>
+            <Text style={styles.inputHeader}>Confirm Password</Text>
+            <View style={styles.inputBox}>
+              <TextInput
+                placeholder="Confirm Password"
+                value={cpassword}
+                onChangeText={(text) => setCPassword(text)}
+                style={styles.input}
+                secureTextEntry
+              />
+            </View>
           </View>
-          <Text style={styles.inputHeader}>Email</Text>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              style={styles.input}
-            />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={handleRegister}
+              style={styles.registerButton}
+            >
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.inputHeader}>Password</Text>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              style={styles.input}
-              secureTextEntry
-            />
-          </View>
-          <Text style={styles.inputHeader}>Confirm Password</Text>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Password"
-              value={cpassword}
-              onChangeText={(text) => setCPassword(text)}
-              style={styles.input}
-              secureTextEntry
-            />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={handleExistingUser}
+              style={styles.existingUserButton}
+            >
+              <Text style={styles.existingUserText}>I am an existing User</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={handleRegister}
-            style={styles.registerButton}
-          >
-            <Text style={styles.buttonText}>Register</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={handleExistingUser}
-            style={styles.existingUserButton}
-          >
-            <Text style={styles.existingUserText}>I am an existing User</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 };
 
@@ -169,7 +175,7 @@ const styles = StyleSheet.create({
   input: {
     fontFamily: "raleway-regular",
     fontSize: 16,
-    margin: 10,
+    margin: 6,
   },
   inputHeader: {
     fontFamily: "raleway-regular",
