@@ -6,9 +6,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-
+  
 // Adding custom fonts to the project
 // Only included regular and bold for now
 const getFonts = () =>
@@ -28,15 +29,24 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen
             options={{ headerShown: false }}
-            name="Register"
-            component={RegisterScreen}
-          />
-         <Stack.Screen
-            options={{ headerShown: false }}
             name="Log In"
             component={LoginScreen}
           />
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Register"
+            component={RegisterScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Home"
+            component={HomeScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Profile"
+            component={ProfileScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );

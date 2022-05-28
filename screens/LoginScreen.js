@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/core";
 import logo from "../assets/ezShare-logo.png";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { HORIZONTAL } from "react-native/Libraries/Components/ScrollView/ScrollViewContext";
-
+  
 // Variable width of current window 
 var width = Dimensions.get('window').width;
 
