@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
-  Image,
+  Image, 
   Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { firestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import logo from "../assets/ezShare-logo.png";
-
+  
 // Variable width of current window 
 var width = Dimensions.get('window').width;
 
