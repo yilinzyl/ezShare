@@ -16,10 +16,10 @@ import { IconButton } from "react-native-paper";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
- 
+
 // Variable height of current window
 var height = Dimensions.get("window").height;
-  
+
 const HomeScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
@@ -40,7 +40,10 @@ const HomeScreen = () => {
           <Text style={styles.header}>Active</Text>
           <Text style={styles.header}>Listings</Text>
         </View>
-        <TouchableOpacity onPress= {() => console.log("Pressed")} style={styles.button}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Create Listing")}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>Create New</Text>
         </TouchableOpacity>
       </View>

@@ -7,6 +7,7 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import ListingScreen from "./screens/ListingScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
   
@@ -46,6 +47,11 @@ export default function App() {
             options={{ headerShown: false }}
             name="Profile"
             component={ProfileScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Create Listing"
+            component={ListingScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
