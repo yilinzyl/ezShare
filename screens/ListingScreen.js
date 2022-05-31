@@ -8,12 +8,14 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { IconButton } from "react-native-paper";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -23,7 +25,7 @@ var height = Dimensions.get("window").height;
 
 const ListingScreen = () => {
   const user = auth.currentUser;
-  const [listDate, setListDate] = useState("");
+  // const [listDate, setListDate] = useState("");
   const [category, setCategory] = useState("");
   const [listingName, setListingName] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -35,9 +37,26 @@ const ListingScreen = () => {
 
   const navigation = useNavigation();
 
+  const exitCreatePopup = () =>
+    Alert.alert("Confirm Exit?", "Changes you make will not be saved", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Exit", onPress: () => navigation.navigate("Home") },
+    ]);
+
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
+        <IconButton
+          icon="arrow-left"
+          color="#B0C0F9"
+          size={0.08 * width}
+          style={{ marginLeft: width * -0.02 }}
+          onPress={exitCreatePopup}
+        />
         <View>
           <Text style={styles.header}>Create Listing</Text>
         </View>
@@ -64,7 +83,7 @@ const ListingScreen = () => {
         <Text style={styles.inputHeader}>Category</Text>
         <View style={styles.inputBox}>
           <TextInput
-            placeholder="Enter Image URL"
+            placeholder="Enter Category"
             value={category}
             onChangeText={(text) => setCategory(text)}
             style={styles.input}
@@ -118,7 +137,9 @@ const ListingScreen = () => {
         <TouchableOpacity
           // onPress={handleCreateListing}
           style={styles.createButton}
-          onPress={navigation.navigate("Home")}
+          onPress={() => {
+            navigation.navigate("Home");
+          }}
         >
           <Text style={styles.buttonText}>Create</Text>
         </TouchableOpacity>
@@ -139,8 +160,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     height: height * 0.15,
-    marginLeft: width * 0.08,
-    marginRight: width * 0.08,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
     marginBottom: height * 0.02,
   },
   header: {
