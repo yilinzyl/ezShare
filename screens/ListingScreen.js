@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
@@ -25,7 +25,6 @@ var height = Dimensions.get("window").height;
 
 const ListingScreen = () => {
   const user = auth.currentUser;
-  // const [listDate, setListDate] = useState("");
   const [category, setCategory] = useState("");
   const [listingName, setListingName] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -36,6 +35,25 @@ const ListingScreen = () => {
   const [collectionPoint, setCollectionPoint] = useState("");
 
   const navigation = useNavigation();
+
+  const handleCreateListing = () => {
+    db.collection("listing")
+      .add({
+        category: category,
+        "collection-point": collectionPoint,
+        "cut-off-date": cutOffDate,
+        "image-url": imageURL,
+        "list-date": new Date(),
+        "listing-description": description,
+        "listing-name": listingName,
+        "other-costs": otherCosts,
+        "target-amount": targetAmount,
+        user: user.uid,
+      })
+      .then(() => {
+        navigation.navigate("Home");
+      });
+  };
 
   const exitCreatePopup = () =>
     Alert.alert("Confirm Exit?", "Changes you make will not be saved", [
@@ -135,11 +153,11 @@ const ListingScreen = () => {
           />
         </View>
         <TouchableOpacity
-          // onPress={handleCreateListing}
+          onPress={handleCreateListing}
           style={styles.createButton}
-          onPress={() => {
-            navigation.navigate("Home");
-          }}
+          // onPress={() => {
+          //   navigation.navigate("Home");
+          // }}
         >
           <Text style={styles.buttonText}>Create</Text>
         </TouchableOpacity>
