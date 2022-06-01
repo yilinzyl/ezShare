@@ -135,5 +135,4 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     marginVertical: height * 0.012,
   },
-}); 
- 
+});
