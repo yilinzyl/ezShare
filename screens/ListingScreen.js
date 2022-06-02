@@ -50,6 +50,7 @@ const ListingScreen = () => {
         "other-costs": otherCosts,
         "target-amount": targetAmount,
         user: user.uid,
+        "user-name": user.displayName,
       })
       .then(() => {
         navigation.navigate("Home");
