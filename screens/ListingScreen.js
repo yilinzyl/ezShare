@@ -16,6 +16,7 @@ import { auth, db } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -29,7 +30,7 @@ const ListingScreen = () => {
   const [listingName, setListingName] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [description, setDescription] = useState("");
-  const [cutOffDate, setCutOffDate] = useState("");
+  const [cutOffDate, setCutOffDate] = useState("Select");
   const [targetAmount, setTargetAmount] = useState("");
   const [otherCosts, setOtherCosts] = useState("");
   const [collectionPoint, setCollectionPoint] = useState("");
@@ -64,6 +65,14 @@ const ListingScreen = () => {
       },
       { text: "Exit", onPress: () => navigation.navigate("Home") },
     ]);
+
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
 
   return (
     <View style={styles.background}>
@@ -117,14 +126,23 @@ const ListingScreen = () => {
           />
         </View>
         <Text style={styles.inputHeader}>Cut-off Date</Text>
-        <View style={styles.inputBox}>
-          <TextInput
-            placeholder="Enter Cut-off Date"
-            value={cutOffDate}
-            onChangeText={(text) => setCutOffDate(text)}
-            style={styles.input}
-          />
-        </View>
+        <TouchableOpacity style={styles.widgetButton} onPress={showDatePicker}>
+          <Text style={styles.widgetText}>{cutOffDate.toString()}</Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="datetime"
+          onConfirm={(date) => {
+            setCutOffDate(date);
+            hideDatePicker();
+            pickDate();
+          }}
+          onCancel={() => {
+            hideDatePicker();
+            console.log("failed to load date");
+          }}
+          onHide={() => hideDatePicker()}
+        />
         <Text style={styles.inputHeader}>Target Amount</Text>
         <View style={styles.inputBox}>
           <TextInput
@@ -156,7 +174,16 @@ const ListingScreen = () => {
           onPress={handleCreateListing}
           style={styles.createButton}
           // onPress={() => {
-          //   navigation.navigate("Home");
+          //   console.log(
+          //     db
+          //       .collection("listing")
+          //       .doc("test")
+          //       .get()
+          //       .then(
+          //         (x) => console.log(x.data()),
+          //         (x) => console.log("fail")
+          //       )
+          //   );
           // }}
         >
           <Text style={styles.buttonText}>Create</Text>
@@ -230,5 +257,17 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     color: "#F9FAFE",
     fontSize: 20,
+  },
+  widgetButton: {
+    color: "white",
+  },
+  widgetText: {
+    fontFamily: "raleway-regular",
+    color: "#6F8EFA",
+    fontSize: 16,
+    textDecorationLine: "underline",
+    marginBottom: 13,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
   },
 });
