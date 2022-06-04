@@ -34,6 +34,7 @@ const ListingScreen = () => {
   const [targetAmount, setTargetAmount] = useState("");
   const [otherCosts, setOtherCosts] = useState("");
   const [collectionPoint, setCollectionPoint] = useState("");
+  const [deliveryFee, setDeliveryFee] = useState("");
 
   const navigation = useNavigation();
 
@@ -41,15 +42,18 @@ const ListingScreen = () => {
     db.collection("listing")
       .add({
         category: category,
-        "collection-point": collectionPoint,
-        "cut-off-date": cutOffDate,
-        "image-url": imageURL,
-        "list-date": new Date(),
-        "listing-description": description,
-        "listing-name": listingName,
-        "other-costs": otherCosts,
-        "target-amount": targetAmount,
+        collectionPoint: collectionPoint,
+        cutOffDate: cutOffDate,
+        imageUrl: imageURL,
+        listDate: new Date(),
+        listingDescription: description,
+        listingName: listingName,
+        otherCosts: otherCosts,
+        deliveryFee: deliveryFee,
+        targetAmount: targetAmount,
+        amountReached: 0,
         user: user.uid,
+        username: user.displayName
       })
       .then(() => {
         navigation.navigate("Home");
@@ -152,7 +156,16 @@ const ListingScreen = () => {
             style={styles.input}
           />
         </View>
-        <Text style={styles.inputHeader}>Other Costs</Text>
+        <Text style={styles.inputHeader}>Delivery Fee</Text>
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="$"
+            value={deliveryFee}
+            onChangeText={(text) => setDeliveryFee(text)}
+            style={styles.input}
+          />
+        </View>
+        <Text style={styles.inputHeader}>Commission Fee</Text>
         <View style={styles.inputBox}>
           <TextInput
             placeholder="$"
