@@ -54,6 +54,7 @@ const ListingScreen = () => {
         amountReached: 0,
         user: user.uid,
         username: user.displayName
+
       })
       .then(() => {
         navigation.navigate("Home");
