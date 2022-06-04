@@ -6250,6 +6250,13 @@
     "jscodeshift" "^0.13.1"
     "nullthrows" "^1.1.1"
 
+"react-native-drop-shadow@^0.0.4":
+  "integrity" "sha512-45Bsq24dcc1rK9H+42H91xEYN/Ql5S0693FseQWdCKgri6D+4vkFeL9dgtrSD5Bg3+RffjMbPDD7BuNS9BZuvg=="
+  "resolved" "https://registry.npmjs.org/react-native-drop-shadow/-/react-native-drop-shadow-0.0.4.tgz"
+  "version" "0.0.4"
+  dependencies:
+    "logkitty" "^0.7.1"
+
 "react-native-gradle-plugin@^0.0.6":
   "integrity" "sha512-eIlgtsmDp1jLC24dRn43hB3kEcZVqx6DUQbR0N1ABXGnMEafm9I3V3dUUeD1vh+Dy5WqijSoEwLNUPLgu5zDMg=="
   "resolved" "https://registry.npmjs.org/react-native-gradle-plugin/-/react-native-gradle-plugin-0.0.6.tgz"
@@ -6318,7 +6325,7 @@
     "normalize-css-color" "^1.0.2"
     "prop-types" "^15.6.0"
 
-"react-native@*", "react-native@>=0.42.0", "react-native@>=0.48.4", "react-native@>=0.65.0", "react-native@0.68.2":
+"react-native@*", "react-native@>=0.42.0", "react-native@>=0.48.4", "react-native@>=0.61.5", "react-native@>=0.65.0", "react-native@0.68.2":
   "integrity" "sha512-qNMz+mdIirCEmlrhapAtAG+SWVx6MAiSfCbFNhfHqiqu1xw1OKXdzIrjaBEPihRC2pcORCoCHduHGQe/Pz9Yuw=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.68.2.tgz"
   "version" "0.68.2"
