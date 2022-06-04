@@ -2,9 +2,11 @@ import {
   StyleSheet,
   Text,
   View,
+  KeyboardAvoidingView,
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Button,
 } from "react-native";
 import React from "react";
 import { auth } from "../firebase";
@@ -58,7 +60,7 @@ const ProfileScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.navigate("Explore")}
           />
           <IconButton
             icon="account"

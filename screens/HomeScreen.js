@@ -2,12 +2,14 @@ import {
   StyleSheet,
   Text,
   View,
+  KeyboardAvoidingView,
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Button,
 } from "react-native";
-import React from "react";
-import { auth } from "../firebase";
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
@@ -30,6 +32,28 @@ const HomeScreen = () => {
       .then(console.log("Signed out"))
       .catch((error) => alert(error.message));
   };
+
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const getPostsFromFirebase = [];
+    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        getPostsFromFirebase.push({
+          ...doc.data(),
+          key: doc.id,
+        });
+      });
+      setPosts(getPostsFromFirebase);
+      setLoading(false);
+    });
+    return () => subscriber();
+  }, []);
+
+  if (loading) {
+    return <Text> Welcome to ezShare! </Text>;
+  }
 
   return (
     <View style={styles.background}>
@@ -64,7 +88,7 @@ const HomeScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.navigate("Explore")}
           />
           <IconButton
             icon="account"

@@ -8,6 +8,8 @@ import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ListingScreen from "./screens/ListingScreen";
+import ExploreScreen from "./screens/ExploreScreen";
+import KeywordSearchScreen from "./screens/KeywordSearchScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 
@@ -52,6 +54,16 @@ export default function App() {
             options={{ headerShown: false }}
             name="Create Listing"
             component={ListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Explore"
+            component={ExploreScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Keyword"
+            component={KeywordSearchScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
