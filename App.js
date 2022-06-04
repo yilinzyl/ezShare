@@ -10,7 +10,7 @@ import ProfileScreen from "./screens/ProfileScreen";
 import ListingScreen from "./screens/ListingScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-  
+
 // Adding custom fonts to the project
 // Only included regular and bold for now
 const getFonts = () =>
