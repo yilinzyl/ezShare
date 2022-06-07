@@ -54,13 +54,13 @@ const ProfileScreen = () => {
             icon="home"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.replace("Home")}
           />
           <IconButton
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Explore")}
+            onPress={() => navigation.replace("Explore")}
           />
           <IconButton
             icon="account"
