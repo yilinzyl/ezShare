@@ -52,14 +52,23 @@ const KeywordSearchScreen = () => {
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
-        <View style={styles.inputBox}>
-          <TextInput
-            placeholder="Enter keyword"
-            //value={keyword}
-            onChangeText={(text) => setKeyword(text)}
-            style={styles.input}
+      
+          <IconButton
+            icon="arrow-left"
+            color="#B0C0F9"
+            size={0.035 * height}
+            style={{ marginLeft: width * -0.7 }}
+            onPress={() => navigation.navigate("Explore")}
           />
-        </View>
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Enter keyword"
+              //value={keyword}
+              onChangeText={(text) => setKeyword(text)}
+              style={styles.input}
+            />
+          </View>
+
         <View style={styles.headerContainerHorizontal}>
           <Text style={styles.header}>Search by Keyword</Text>
           {/* <TouchableOpacity
@@ -77,8 +86,10 @@ const KeywordSearchScreen = () => {
             .filter(
               (post) =>
                 keyword != "" &&
-                (post.listingName.toLowerCase().includes(keyword) ||
-                  post.category.toLowerCase().includes(keyword))
+                (post.listingName
+                  .toLowerCase()
+                  .includes(keyword.toLowerCase()) ||
+                  post.category.toLowerCase().includes(keyword.toLowerCase()))
             )
             .map((post) => (
               <View key={post.listingName} style={styles.listing}>
@@ -164,7 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: 0.8 * width,
-    marginLeft: width * 0.1,
+    marginLeft: 0.075 * width
   },
   header: {
     fontFamily: "raleway-bold",
@@ -217,10 +228,9 @@ const styles = StyleSheet.create({
     borderColor: "#B0C0F9",
     borderWidth: 2,
     borderRadius: 10,
-    width: width * 0.8,
+    width: width * 0.85,
     height: height * 0.05,
-    marginLeft: width * 0.2,
-    marginRight: width * 0.1,
+    marginLeft: width * 0.075,
     marginBottom: height * 0.02,
   },
   input: {

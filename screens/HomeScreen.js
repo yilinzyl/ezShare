@@ -88,13 +88,13 @@ const HomeScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Explore")}
+            onPress={() => navigation.replace("Explore")}
           />
           <IconButton
             icon="account"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Profile")}
+            onPress={() => navigation.replace("Profile")}
           />
         </View>
       </View>
