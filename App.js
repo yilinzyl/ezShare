@@ -10,6 +10,9 @@ import ProfileScreen from "./screens/ProfileScreen";
 import ListingScreen from "./screens/ListingScreen";
 import ExploreScreen from "./screens/ExploreScreen";
 import KeywordSearchScreen from "./screens/KeywordSearchScreen";
+import MyListingsScreen from "./screens/MyListingsScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+import PasswordScreen from "./screens/PasswordScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 
@@ -64,6 +67,21 @@ export default function App() {
             options={{ headerShown: false }}
             name="Keyword"
             component={KeywordSearchScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="My Listings"
+            component={MyListingsScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Edit"
+            component={EditProfileScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Password"
+            component={PasswordScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
