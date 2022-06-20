@@ -10,15 +10,12 @@ import ProfileScreen from "./screens/ProfileScreen";
 import CreateListingScreen from "./screens/CreateListingScreen";
 import ExploreScreen from "./screens/ExploreScreen";
 import KeywordSearchScreen from "./screens/KeywordSearchScreen";
-<<<<<<< Updated upstream
-=======
 import MyListingsScreen from "./screens/MyListingsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import JoinListingScreen from "./screens/JoinListingScreen";
 import ViewListingScreen from "./screens/ViewListingScreen";
 import PasswordScreen from "./screens/PasswordScreen";
 import TrackScreen from "./screens/TrackScreen";
->>>>>>> Stashed changes
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import JoinerDetails from "./screens/JoinerDetailsScreen";
@@ -75,8 +72,6 @@ export default function App() {
             name="Keyword"
             component={KeywordSearchScreen}
           />
-<<<<<<< Updated upstream
-=======
           <Stack.Screen
             options={{ headerShown: false }}
             name="My Listings"
@@ -112,7 +107,6 @@ export default function App() {
             name="Joiner Details"
             component={JoinerDetails}
           />
->>>>>>> Stashed changes
         </Stack.Navigator>
       </NavigationContainer>
     );

@@ -288,10 +288,7 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
   },
-<<<<<<< Updated upstream:screens/ListingScreen.js
-=======
   buttonBottom: {
     height: 0.05 * height,
   },
->>>>>>> Stashed changes:screens/CreateListingScreen.js
 });
