@@ -125,20 +125,26 @@ const ExploreScreen = () => {
                 category == "Find something that interests you"
             )
             .map((post) => (
-              <View key={post.listingName} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
-                  <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("View Listing", { listingId: post.key })
+                }
+              >
+                <View key={post.listingName} style={styles.listing}>
+                  {/* temporary image for testing purposes */}
+                  <Image source={logo} style={styles.appLogo} />
+                  <View style={styles.listingTextContainer}>
+                    <Text style={styles.listingTitle}>{post.listingName}</Text>
+                    <Text style={styles.listingText}>
+                      {post.listingDescription}
+                    </Text>
+                    <Text style={styles.listingText}>{post.category}</Text>
+                    <Text style={styles.listingCreator}>
+                      Created by {post.username}
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
         ) : (
           <Text>no posts yet</Text>
@@ -194,8 +200,18 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#b0c0f9",
+<<<<<<< Updated upstream
     height: 45 ,
     width: width * 0.4,
+=======
+<<<<<<< Updated upstream
+    height: 50,
+    width: width * 0.43,
+=======
+    height: 45,
+    width: width * 0.4,
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
     borderRadius: 45,
     alignItems: "center",
     justifyContent: "center",
@@ -284,7 +300,7 @@ const styles = StyleSheet.create({
     borderColor: "#eeedff",
     borderTopWidth: 2,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   listingTextContainer: {
     marginLeft: 0.05 * width,
