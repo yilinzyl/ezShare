@@ -33,10 +33,11 @@ const TrackScreen = ({ route, navigation }) => {
   const [listingName, setListingName] = useState("");
   const [acceptingOrders, setAcceptingOrders] = useState("");
   const [status, setStatus] = useState("");
+  const [readyForCollection, setReadyForCollection] = useState(false);
   const [joiners, setJoiners] = useState([]);
 
   const handleStopAcceptingOrders = () =>
-    Alert.alert("Action cannot be reversed", [
+    Alert.alert("Confirm?", "Action cannot be reversed", [
       {
         text: "Cancel",
         onPress: () => console.log("Cancel Pressed"),
@@ -52,6 +53,29 @@ const TrackScreen = ({ route, navigation }) => {
             })
             .then(() => {
               console.log("Stopped Accepting Orders");
+            });
+        },
+      },
+    ]);
+
+  const handleReadyToCollect = () =>
+    Alert.alert("Confirm?", "Action cannot be reversed", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Confirm",
+        onPress: () => {
+          console.log("Updated Ready To Collect");
+          db.collection("listing")
+            .doc(listingId)
+            .update({
+              readyForCollection: true,
+            })
+            .then(() => {
+              console.log("Updated Ready To Collect");
             });
         },
       },
@@ -77,6 +101,7 @@ const TrackScreen = ({ route, navigation }) => {
         setListingName(listingData.listingName);
         setAcceptingOrders(listingData.acceptingOrders);
         setStatus(listingData.status);
+        setReadyForCollection(listingData.readyForCollection);
         setLoadingListingInfo(false);
       });
     const getJoinersFromFirebase = [];
@@ -128,6 +153,14 @@ const TrackScreen = ({ route, navigation }) => {
               style={styles.updateButton}
             >
               <Text style={styles.buttonText}>Stop Accepting Orders</Text>
+            </TouchableOpacity>
+          )}
+          {!readyForCollection && (
+            <TouchableOpacity
+              onPress={handleReadyToCollect}
+              style={styles.updateButton}
+            >
+              <Text style={styles.buttonText}>Ready to Collect</Text>
             </TouchableOpacity>
           )}
           <Text style={styles.inputHeader}>Update Status</Text>

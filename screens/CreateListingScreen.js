@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     fontSize: (60 * width) / height,
   },
   listingContainer: {
-    height: height * 0.8,
+    height: height * 0.87,
   },
   inputBox: {
     borderColor: "#B0C0F9",
