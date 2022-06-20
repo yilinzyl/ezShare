@@ -56,27 +56,6 @@ const KeywordSearchScreen = () => {
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
-<<<<<<< Updated upstream
-      
-          <IconButton
-            icon="arrow-left"
-            color="#B0C0F9"
-            size={0.035 * height}
-            style={{ marginLeft: width * -0.7 }}
-            onPress={() => navigation.navigate("Explore")}
-          />
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Enter keyword"
-              //value={keyword}
-              onChangeText={(text) => setKeyword(text)}
-              style={styles.input}
-            />
-          </View>
-
-=======
-<<<<<<< Updated upstream
-=======
         <IconButton
           icon="arrow-left"
           color="#B0C0F9"
@@ -84,7 +63,6 @@ const KeywordSearchScreen = () => {
           style={{ marginLeft: width * -0.7 }}
           onPress={() => navigation.navigate("Explore")}
         />
->>>>>>> Stashed changes
         <View style={styles.inputBox}>
           <TextInput
             placeholder="Enter keyword"
@@ -93,11 +71,6 @@ const KeywordSearchScreen = () => {
             style={styles.input}
           />
         </View>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
->>>>>>> Stashed changes
         <View style={styles.headerContainerHorizontal}>
           <Text style={styles.header}>Search by Keyword</Text>
           {/* <TouchableOpacity
@@ -111,7 +84,7 @@ const KeywordSearchScreen = () => {
       <ScrollView style={styles.listingContainer}>
         {posts.length > 0 ? (
           posts
-            .filter((post) => post.listingName != null && post.acceptingOrders)
+            .filter((post) => post.listingName != null)
             .filter(
               (post) =>
                 keyword != "" &&
@@ -210,15 +183,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: 0.8 * width,
-<<<<<<< Updated upstream
-    marginLeft: 0.075 * width
-=======
-<<<<<<< Updated upstream
-    marginLeft: width * 0.1,
-=======
     marginLeft: 0.075 * width,
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   },
   header: {
     fontFamily: "raleway-bold",
