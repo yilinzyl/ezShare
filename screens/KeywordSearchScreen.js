@@ -7,7 +7,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
-  Image
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
@@ -47,11 +47,16 @@ const KeywordSearchScreen = () => {
   }, []);
 
   if (loading) {
-    return <Text> Loading... </Text>;
+    return (
+      <View>
+        <Text style={styles.header}>"Loading..."</Text>
+      </View>
+    );
   }
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
+<<<<<<< Updated upstream
       
           <IconButton
             icon="arrow-left"
@@ -69,6 +74,30 @@ const KeywordSearchScreen = () => {
             />
           </View>
 
+=======
+<<<<<<< Updated upstream
+=======
+        <IconButton
+          icon="arrow-left"
+          color="#B0C0F9"
+          size={0.035 * height}
+          style={{ marginLeft: width * -0.7 }}
+          onPress={() => navigation.navigate("Explore")}
+        />
+>>>>>>> Stashed changes
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Enter keyword"
+            //value={keyword}
+            onChangeText={(text) => setKeyword(text)}
+            style={styles.input}
+          />
+        </View>
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
         <View style={styles.headerContainerHorizontal}>
           <Text style={styles.header}>Search by Keyword</Text>
           {/* <TouchableOpacity
@@ -82,7 +111,7 @@ const KeywordSearchScreen = () => {
       <ScrollView style={styles.listingContainer}>
         {posts.length > 0 ? (
           posts
-            .filter((post) => post.listingName != null)
+            .filter((post) => post.listingName != null && post.acceptingOrders)
             .filter(
               (post) =>
                 keyword != "" &&
@@ -92,20 +121,26 @@ const KeywordSearchScreen = () => {
                   post.category.toLowerCase().includes(keyword.toLowerCase()))
             )
             .map((post) => (
-              <View key={post.listingName} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
-                  <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("View Listing", { listingId: post.key })
+                }
+              >
+                <View key={post.listingName} style={styles.listing}>
+                  {/* temporary image for testing purposes */}
+                  <Image source={logo} style={styles.appLogo} />
+                  <View style={styles.listingTextContainer}>
+                    <Text style={styles.listingTitle}>{post.listingName}</Text>
+                    <Text style={styles.listingText}>
+                      {post.listingDescription}
+                    </Text>
+                    <Text style={styles.listingText}>{post.category}</Text>
+                    <Text style={styles.listingCreator}>
+                      Created by {post.username}
+                    </Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
         ) : (
           <Text>no posts yet</Text>
@@ -175,7 +210,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: 0.8 * width,
+<<<<<<< Updated upstream
     marginLeft: 0.075 * width
+=======
+<<<<<<< Updated upstream
+    marginLeft: width * 0.1,
+=======
+    marginLeft: 0.075 * width,
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
   },
   header: {
     fontFamily: "raleway-bold",
