@@ -200,18 +200,8 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#b0c0f9",
-<<<<<<< Updated upstream
-    height: 45 ,
-    width: width * 0.4,
-=======
-<<<<<<< Updated upstream
-    height: 50,
-    width: width * 0.43,
-=======
     height: 45,
     width: width * 0.4,
->>>>>>> Stashed changes
->>>>>>> Stashed changes
     borderRadius: 45,
     alignItems: "center",
     justifyContent: "center",
