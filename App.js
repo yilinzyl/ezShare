@@ -7,9 +7,15 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import ListingScreen from "./screens/ListingScreen";
+import ExploreScreen from "./screens/ExploreScreen";
+import KeywordSearchScreen from "./screens/KeywordSearchScreen";
+import MyListingsScreen from "./screens/MyListingsScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+import PasswordScreen from "./screens/PasswordScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-  
+
 // Adding custom fonts to the project
 // Only included regular and bold for now
 const getFonts = () =>
@@ -46,6 +52,36 @@ export default function App() {
             options={{ headerShown: false }}
             name="Profile"
             component={ProfileScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Create Listing"
+            component={ListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Explore"
+            component={ExploreScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Keyword"
+            component={KeywordSearchScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="My Listings"
+            component={MyListingsScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Edit"
+            component={EditProfileScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Password"
+            component={PasswordScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -8,18 +8,18 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import React from "react";
-import { auth } from "../firebase";
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
- 
+
 // Variable height of current window
 var height = Dimensions.get("window").height;
-  
+
 const HomeScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
@@ -33,6 +33,28 @@ const HomeScreen = () => {
       .catch((error) => alert(error.message));
   };
 
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const getPostsFromFirebase = [];
+    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        getPostsFromFirebase.push({
+          ...doc.data(),
+          key: doc.id,
+        });
+      });
+      setPosts(getPostsFromFirebase);
+      setLoading(false);
+    });
+    return () => subscriber();
+  }, []);
+
+  if (loading) {
+    return <Text> Welcome to ezShare! </Text>;
+  }
+
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
@@ -40,7 +62,10 @@ const HomeScreen = () => {
           <Text style={styles.header}>Active</Text>
           <Text style={styles.header}>Listings</Text>
         </View>
-        <TouchableOpacity onPress= {() => console.log("Pressed")} style={styles.button}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Create Listing")}
+          style={styles.button}
+        >
           <Text style={styles.buttonText}>Create New</Text>
         </TouchableOpacity>
       </View>
@@ -63,13 +88,13 @@ const HomeScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => console.log("Pressed")}
+            onPress={() => navigation.replace("Explore")}
           />
           <IconButton
             icon="account"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Profile")}
+            onPress={() => navigation.replace("Profile")}
           />
         </View>
       </View>
