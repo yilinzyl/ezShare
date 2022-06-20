@@ -206,7 +206,9 @@ const CreateListingScreen = () => {
         >
           <Text style={styles.buttonText}>Create</Text>
         </TouchableOpacity>
+        <View style={styles.buttonBottom}></View>
       </ScrollView>
+      <View style={styles.footer}></View>
     </View>
   );
 };
@@ -236,7 +238,7 @@ const styles = StyleSheet.create({
     fontSize: (60 * width) / height,
   },
   listingContainer: {
-    height: height * 0.87,
+    height: height * 0.8,
   },
   inputBox: {
     borderColor: "#B0C0F9",

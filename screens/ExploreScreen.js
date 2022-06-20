@@ -162,7 +162,7 @@ const ExploreScreen = () => {
             icon="home"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Home")}
+            onPress={() => navigation.replace("Home")}
           />
           <IconButton
             icon="magnify"
@@ -174,7 +174,7 @@ const ExploreScreen = () => {
             icon="account"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Profile")}
+            onPress={() => navigation.replace("Profile")}
           />
         </View>
       </View>
@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#b0c0f9",
-    height: 50,
-    width: width * 0.43,
+    height: 45 ,
+    width: width * 0.4,
     borderRadius: 45,
     alignItems: "center",
     justifyContent: "center",
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   longCatButton: {
     //backgroundColor: "#e4e6f0",
     height: height * 0.06,
-    width: width * 0.25,
+    width: width * 0.28,
     alignItems: "center",
     justifyContent: "center",
   },
