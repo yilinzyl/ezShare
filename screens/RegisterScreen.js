@@ -5,21 +5,21 @@ import {
   KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
-  Image, 
-  Dimensions
+  Image,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { firestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/core";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import logo from "../assets/ezShare-logo.png";
-  
-// Variable width of current window 
-var width = Dimensions.get('window').width;
+
+// Variable width of current window
+var width = Dimensions.get("window").width;
 
 // Variable height of current window
-var height = Dimensions.get('window').height;
+var height = Dimensions.get("window").height;
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -61,16 +61,14 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: "#B0C0F9" }}
-    >
+    <View style={{ flex: 1, backgroundColor: "#B0C0F9" }}>
       <View style={styles.logoContainer}>
         <Image source={logo} style={styles.appLogo} />
       </View>
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         // scrollEnabled={false}
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         <View style={styles.roundedContainer}>
           <Text style={styles.header}>Create an account</Text>
