@@ -7,12 +7,14 @@ import {
   Dimensions,
   ScrollView,
   Button,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
+import logo from "../assets/lazada.jpg";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -33,26 +35,50 @@ const HomeScreen = () => {
       .catch((error) => alert(error.message));
   };
 
-  const [loading, setLoading] = useState(true);
+  const [loadingListings, setLoadingListings] = useState(true);
+  const [loadingJoiners, setLoadingJoiners] = useState(true);
   const [posts, setPosts] = useState([]);
+  const [listingIds, setlistingIds] = useState([]);
 
   useEffect(() => {
     const getPostsFromFirebase = [];
-    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        getPostsFromFirebase.push({
-          ...doc.data(),
-          key: doc.id,
+    const subscriberListings = db
+      .collection("listing")
+      .onSnapshot((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          getPostsFromFirebase.push({
+            ...doc.data(),
+            key: doc.id,
+          });
         });
+        setPosts(getPostsFromFirebase);
+        setLoadingListings(false);
       });
-      setPosts(getPostsFromFirebase);
-      setLoading(false);
-    });
-    return () => subscriber();
+    const getListingIdsFromFirebase = [];
+    const subscriberPosts = db
+      .collection("joined")
+      .onSnapshot((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const joinedData = doc.data();
+          if (user.uid == joinedData.userID) {
+            getListingIdsFromFirebase.push(joinedData.listingID);
+          }
+        });
+        setlistingIds(getListingIdsFromFirebase);
+        setLoadingJoiners(false);
+      });
+    return () => {
+      subscriberListings();
+      subscriberPosts();
+    };
   }, []);
 
-  if (loading) {
-    return <Text> Welcome to ezShare! </Text>;
+  if (loadingListings || loadingJoiners) {
+    return (
+      <View>
+        <Text style={styles.header}>Welcome to ezShare!</Text>
+      </View>
+    );
   }
 
   return (
@@ -70,11 +96,92 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.listingContainer}>
-        <View style={styles.listing}></View>
-        <View style={styles.listing}></View>
-        <View style={styles.listing}></View>
-        <View style={styles.listing}></View>
-        <View style={styles.listing}></View>
+        <Text style={styles.infoHeader}>Created by Me</Text>
+        {posts
+          .filter((post) => post.user == user.uid && !post.closed)
+          .map((post) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("View Listing", { listingId: post.key })
+              }
+            >
+              <View key={post.listingName} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  <Text style={styles.listingTitle}>{post.listingName}</Text>
+                  <Text style={styles.listingText}>
+                    {post.listingDescription}
+                  </Text>
+                  <Text style={styles.listingText}>{post.category}</Text>
+                  <Text style={styles.listingCreator}>
+                    Created by {post.username}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        <Text style={styles.infoHeader}>Joined Listings</Text>
+        <Text style={styles.info}>Ready For Collection</Text>
+        {posts
+          .filter(
+            (post) =>
+              listingIds.includes(post.key) &&
+              !post.closed &&
+              post.readyForCollection
+          )
+          .map((post) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("View Listing", { listingId: post.key })
+              }
+            >
+              <View key={post.listingName} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  <Text style={styles.listingTitle}>{post.listingName}</Text>
+                  <Text style={styles.listingText}>
+                    {post.listingDescription}
+                  </Text>
+                  <Text style={styles.listingText}>{post.category}</Text>
+                  <Text style={styles.listingCreator}>
+                    Created by {post.username}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        <Text style={styles.info}>Pending</Text>
+        {posts
+          .filter(
+            (post) =>
+              listingIds.includes(post.key) &&
+              !post.closed &&
+              !post.readyForCollection
+          )
+          .map((post) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("View Listing", { listingId: post.key })
+              }
+            >
+              <View key={post.listingName} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  <Text style={styles.listingTitle}>{post.listingName}</Text>
+                  <Text style={styles.listingText}>
+                    {post.listingDescription}
+                  </Text>
+                  <Text style={styles.listingText}>{post.category}</Text>
+                  <Text style={styles.listingCreator}>
+                    Created by {post.username}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
       </ScrollView>
       <View style={styles.footer}>
         <View style={styles.footerContainer}>
@@ -108,6 +215,10 @@ const styles = StyleSheet.create({
   background: {
     backgroundColor: "#f9fafe",
   },
+  appLogo: {
+    height: height * 0.13,
+    width: height * 0.13,
+  },
   button: {
     backgroundColor: "#F898A3",
     height: width * 0.125,
@@ -139,17 +250,18 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     fontSize: (60 * width) / height,
   },
-  listingContainer: {
-    height: height * 0.67,
+  info: {
+    fontFamily: "raleway-regular",
+    fontSize: 16,
+    marginLeft: width * 0.05,
+    marginBottom: 15,
   },
-  listing: {
-    borderRadius: 20,
-    backgroundColor: "#bababa",
-    height: height * 0.15,
-    width: width * 0.8,
-    marginLeft: width * 0.1,
-    marginRight: width * 0.1,
-    marginTop: height * 0.02,
+  infoHeader: {
+    fontFamily: "raleway-bold",
+    fontSize: 18,
+    color: "#404040",
+    margin: 6,
+    marginLeft: width * 0.05,
   },
   footer: {
     backgroundColor: "#f2f2f2",
@@ -160,5 +272,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     marginVertical: height * 0.012,
+  },
+  listingContainer: {
+    height: height * 0.67,
+    backgroundColor: "#f9fafe",
+  },
+  listing: {
+    backgroundColor: "#f9fafe",
+    height: height * 0.15,
+    display: "flex",
+    flexDirection: "row",
+    borderColor: "#eeedff",
+    borderTopWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  listingTextContainer: {
+    marginLeft: 0.05 * width,
+    width: 0.6 * width,
+  },
+  listingTitle: {
+    fontFamily: "raleway-bold",
+    color: "#262626",
+    fontSize: (30 * width) / height,
+  },
+  listingText: {
+    fontFamily: "raleway-regular",
+    color: "#707070",
+    fontSize: (30 * width) / height,
+  },
+  listingCreator: {
+    fontFamily: "raleway-bold",
+    color: "#B0C0F9",
+    fontSize: (30 * width) / height,
   },
 });
