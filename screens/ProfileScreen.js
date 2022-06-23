@@ -98,8 +98,7 @@ const ProfileScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.replace("Explore")}
-          />
+            onPress={() => navigation.navigate("Explore")}/>
           <IconButton
             icon="account"
             color="#b0c0f9"
