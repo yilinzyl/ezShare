@@ -24,7 +24,7 @@ var width = Dimensions.get("window").width;
 // Variable height of current window
 var height = Dimensions.get("window").height;
 
-const ListingScreen = () => {
+const CreateListingScreen = () => {
   const user = auth.currentUser;
   const [category, setCategory] = useState("");
   const [listingName, setListingName] = useState("");
@@ -53,10 +53,15 @@ const ListingScreen = () => {
         targetAmount: targetAmount,
         amountReached: 0,
         user: user.uid,
-        username: user.displayName
+        username: user.displayName,
+        currentAmount: 0,
+        acceptingOrders: true,
+        status: "Accepting Orders - Target not reached",
+        readyForCollection: false,
+        closed: false,
       })
-      .then(() => {
-        navigation.navigate("Home");
+      .then((docRef) => {
+        navigation.navigate("View Listing", { listingId: docRef.id });
       });
   };
 
@@ -67,7 +72,7 @@ const ListingScreen = () => {
         onPress: () => console.log("Cancel Pressed"),
         style: "cancel",
       },
-      { text: "Exit", onPress: () => navigation.navigate("Home") },
+      { text: "Exit", onPress: () => navigation.goBack() },
     ]);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -201,12 +206,14 @@ const ListingScreen = () => {
         >
           <Text style={styles.buttonText}>Create</Text>
         </TouchableOpacity>
+        <View style={styles.buttonBottom}></View>
       </ScrollView>
+      <View style={styles.footer}></View>
     </View>
   );
 };
 
-export default ListingScreen;
+export default CreateListingScreen;
 
 const styles = StyleSheet.create({
   background: {
@@ -282,5 +289,8 @@ const styles = StyleSheet.create({
     marginBottom: 13,
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
+  },
+  buttonBottom: {
+    height: 0.05 * height,
   },
 });

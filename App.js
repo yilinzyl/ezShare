@@ -7,12 +7,28 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+<<<<<<< HEAD
 import ListingScreen from "./screens/ListingScreen";
 import ExploreScreen from "./screens/ExploreScreen";
 import KeywordSearchScreen from "./screens/KeywordSearchScreen";
+=======
+import CreateListingScreen from "./screens/CreateListingScreen";
+import ExploreScreen from "./screens/ExploreScreen";
+import KeywordSearchScreen from "./screens/KeywordSearchScreen";
+import MyListingsScreen from "./screens/MyListingsScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+import JoinListingScreen from "./screens/JoinListingScreen";
+import ViewListingScreen from "./screens/ViewListingScreen";
+import PasswordScreen from "./screens/PasswordScreen";
+import UserSearchScreen from "./screens/UserSearchScreen";
+
+import TrackScreen from "./screens/TrackScreen";
+
+>>>>>>> 1b98f13a8d8968cd24b411926bf690c97f0ea218
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
-  
+import JoinerDetails from "./screens/JoinerDetailsScreen";
+
 // Adding custom fonts to the project
 // Only included regular and bold for now
 const getFonts = () =>
@@ -53,7 +69,57 @@ export default function App() {
           <Stack.Screen
             options={{ headerShown: false }}
             name="Create Listing"
-            component={ListingScreen}
+            component={CreateListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Explore"
+            component={ExploreScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Keyword"
+            component={KeywordSearchScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="My Listings"
+            component={MyListingsScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Edit"
+            component={EditProfileScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Password"
+            component={PasswordScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+
+            name="User Search"
+            component={UserSearchScreen}
+
+            name="View Listing"
+            component={ViewListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Join Listing"
+            component={JoinListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Track"
+            component={TrackScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Joiner Details"
+            component={JoinerDetails}
+
           />
           <Stack.Screen
             options={{ headerShown: false }}
