@@ -92,10 +92,11 @@ export default function App() {
           />
           <Stack.Screen
             options={{ headerShown: false }}
-
             name="User Search"
             component={UserSearchScreen}
-
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
             name="View Listing"
             component={ViewListingScreen}
           />
@@ -113,9 +114,7 @@ export default function App() {
             options={{ headerShown: false }}
             name="Joiner Details"
             component={JoinerDetails}
-
           />
-
         </Stack.Navigator>
       </NavigationContainer>
     );
