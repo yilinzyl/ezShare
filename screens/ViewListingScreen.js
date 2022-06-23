@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import logo from "../assets/lazada.jpg";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -55,7 +56,12 @@ const ViewListingScreen = ({ route, navigation }) => {
         setCategory(listingData.category);
         setListingName(listingData.listingName);
         setDescription(listingData.listingDescription);
-        setCutOffDate(listingData.cutOffDate);
+        setCutOffDate(
+          new Date(
+            listingData.cutOffDate.seconds * 1000 +
+              listingData.cutOffDate.nanoseconds / 1000000
+          )
+        );
         setTargetAmount(listingData.targetAmount);
         setOtherCosts(listingData.otherCosts);
         setCollectionPoint(listingData.collectionPoint);
@@ -89,13 +95,15 @@ const ViewListingScreen = ({ route, navigation }) => {
           />
           <View>
             <Text style={styles.header}>{listingName}</Text>
+            <Text style={styles.createdBy}>Created by {listingOwnerName}</Text>
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
+          <View style={styles.imageContainer}>
+            <Image source={logo} />
+          </View>
           <Text style={styles.infoHeader}>Category</Text>
           <Text style={styles.info}>{category}</Text>
-          <Text style={styles.infoHeader}>Creator</Text>
-          <Text style={styles.info}>{listingOwnerName}</Text>
           <Text style={styles.infoHeader}>Status</Text>
           <Text style={styles.info}>{status}</Text>
           <Text style={styles.infoHeader}>Description</Text>
@@ -144,13 +152,14 @@ export default ViewListingScreen;
 const styles = StyleSheet.create({
   background: {
     backgroundColor: "white",
+    flex: 1,
   },
   headerContainer: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    height: height * 0.15,
+    marginTop: height * 0.05,
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
     marginBottom: height * 0.02,
@@ -159,13 +168,17 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     fontSize: (60 * width) / height,
   },
+  createdBy: {
+    color: "#B0C0F9",
+    textAlign: "right",
+    fontFamily: "raleway-bold",
+    fontSize: 15,
+  },
   name: {
     fontFamily: "raleway-bold",
     fontSize: (60 * width) / height,
   },
-  listingContainer: {
-    height: height * 0.87,
-  },
+  listingContainer: { flex: 1 },
   info: {
     fontFamily: "raleway-regular",
     fontSize: 16,
@@ -197,5 +210,9 @@ const styles = StyleSheet.create({
   },
   buttonBottom: {
     height: 0.05 * height,
+  },
+  imageContainer: {
+    alignItems: "center",
+    textAlign: "center",
   },
 });

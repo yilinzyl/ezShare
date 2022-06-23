@@ -16,7 +16,14 @@ const firebaseConfig = {
   measurementId: "G-ZQE2YT0CJV",
 };
 
-const app = firebase.initializeApp(firebaseConfig);
+let app;
+if (!firebase.apps.length) {
+  app = firebase.initializeApp(firebaseConfig);
+} else {
+  app = firebase.app(); // if already initialized, use that one
+}
+
+// const app = firebase.initializeApp(firebaseConfig);
 // let app;
 // if (firebase.apps.length === 0) {
 //   app = firebase.initializeApp(firebaseConfig);
@@ -26,5 +33,6 @@ const app = firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+const cloudStorage = firebase.storage();
 
-export { auth, db };
+export { auth, db, cloudStorage };
