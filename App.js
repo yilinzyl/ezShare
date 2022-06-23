@@ -13,6 +13,7 @@ import KeywordSearchScreen from "./screens/KeywordSearchScreen";
 import MyListingsScreen from "./screens/MyListingsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import PasswordScreen from "./screens/PasswordScreen";
+import UserSearchScreen from "./screens/UserSearchScreen";
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 
@@ -82,6 +83,11 @@ export default function App() {
             options={{ headerShown: false }}
             name="Password"
             component={PasswordScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="User Search"
+            component={UserSearchScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
