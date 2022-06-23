@@ -2,20 +2,22 @@ import {
   StyleSheet,
   Text,
   View,
-  KeyboardAvoidingView,
   TextInput,
   TouchableOpacity,
   Image,
   Dimensions,
   ScrollView,
   Alert,
+  Button,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DropDownPicker from "react-native-dropdown-picker";
+import * as ImagePicker from "expo-image-picker";
+import Loader from "react-native-modal-loader";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -36,6 +38,8 @@ const CreateListingScreen = () => {
   const [deliveryFee, setDeliveryFee] = useState("");
   const [errorFields, setErrorFields] = useState([]);
   const [errorMessages, setErrorMessages] = useState({});
+  const [image, setImage] = useState(null);
+  const [posting, setPosting] = useState(false);
 
   const [open, setOpen] = useState(false);
   const categoryOptions = [
@@ -97,6 +101,7 @@ const CreateListingScreen = () => {
     setErrorMessages(nowErrorMessages);
 
     if (nowErrorFields.length == 0) {
+      setPosting(true);
       db.collection("listing")
         .add({
           category: category,
@@ -117,9 +122,14 @@ const CreateListingScreen = () => {
           status: "Accepting Orders - Target not reached",
           readyForCollection: false,
           closed: false,
+          imagePresent: image != null,
         })
         .then((docRef) => {
-          navigation.navigate("View Listing", { listingId: docRef.id });
+          if (image != null) {
+            uploadImage(image, docRef.id);
+          } else {
+            navigation.navigate("View Listing", { listingId: docRef.id });
+          }
         });
     }
   };
@@ -142,8 +152,53 @@ const CreateListingScreen = () => {
     setDatePickerVisibility(false);
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const uploadImage = async (uri, id) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response); // when BlobModule finishes reading, resolve with the blob
+      };
+      xhr.onerror = function () {
+        reject(new TypeError("Network request failed")); // error occurred, rejecting
+      };
+      xhr.responseType = "blob"; // use BlobModule's UriHandler
+      xhr.open("GET", uri, true); // fetch the blob from uri in async mode
+      xhr.send(null); // no initial data
+    });
+    var ref = cloudStorage.ref("listingImages/" + id + ".jpg");
+    return ref.put(blob).then(() => {
+      blob.close();
+      navigation.navigate("View Listing", { listingId: id });
+    });
+  };
+
   return (
     <View style={styles.background}>
+      <Loader loading={posting} color="#ff66be" />
       <View style={styles.headerContainer}>
         <IconButton
           icon="arrow-left"
@@ -180,14 +235,34 @@ const CreateListingScreen = () => {
             style={styles.input}
           />
         </View>
-        <Text style={styles.inputHeader}>Add Image URL</Text>
-        <View style={styles.inputBox}>
-          <TextInput
-            placeholder="Enter Image URL"
-            value={imageURL}
-            onChangeText={(text) => setImageURL(text)}
-            style={styles.input}
+        <Text style={styles.inputHeader}>Add Image</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <IconButton
+            icon="camera"
+            mode="contained-tonal"
+            color="#B0C0F9"
+            size={(80 * width) / height}
+            onPress={takePhoto}
           />
+          <IconButton
+            icon="camera-burst"
+            mode="contained-tonal"
+            color="#B0C0F9"
+            size={(80 * width) / height}
+            onPress={pickImage}
+          />
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
         </View>
         <View style={styles.listingTitleAndErrorContainer}>
           <Text style={styles.inputHeader}>Category</Text>
@@ -277,7 +352,7 @@ const CreateListingScreen = () => {
             placeholder="S$"
             value={targetAmount}
             onChangeText={(text) => {
-              const numericRegex = /^([0-9]{0,100})+$/;
+              const numericRegex = /^([.,0-9]{0,100})+$/;
               if (numericRegex.test(text)) {
                 setTargetAmount(text);
               }
@@ -306,7 +381,7 @@ const CreateListingScreen = () => {
             placeholder="S$"
             value={deliveryFee}
             onChangeText={(text) => {
-              const numericRegex = /^([0-9]{0,100})+$/;
+              const numericRegex = /^([.,0-9]{0,100})+$/;
               if (numericRegex.test(text)) {
                 setDeliveryFee(text);
               }
@@ -335,7 +410,7 @@ const CreateListingScreen = () => {
             placeholder="S$"
             value={otherCosts}
             onChangeText={(text) => {
-              const numericRegex = /^([0-9]{0,100})+$/;
+              const numericRegex = /^([.,0-9]{0,100})+$/;
               if (numericRegex.test(text)) {
                 setOtherCosts(text);
               }
@@ -362,6 +437,7 @@ const CreateListingScreen = () => {
           ]}
         >
           <TextInput
+            multiline
             placeholder="Enter Collection Point"
             value={collectionPoint}
             onChangeText={(text) => setCollectionPoint(text)}
