@@ -7,7 +7,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
-  Image,
+  Image
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
@@ -22,7 +22,7 @@ var width = Dimensions.get("window").width;
 // Variable height of current window
 var height = Dimensions.get("window").height;
 
-const KeywordSearchScreen = () => {
+const UserSearchScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
 
@@ -33,7 +33,7 @@ const KeywordSearchScreen = () => {
 
   useEffect(() => {
     const getPostsFromFirebase = [];
-    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
+    const subscriber = db.collection("users").onSnapshot((querySnapshot) => {
       querySnapshot.forEach((doc) => {
         getPostsFromFirebase.push({
           ...doc.data(),
@@ -47,32 +47,30 @@ const KeywordSearchScreen = () => {
   }, []);
 
   if (loading) {
-    return (
-      <View>
-        <Text style={styles.header}>"Loading..."</Text>
-      </View>
-    );
+    return <Text> Loading... </Text>;
   }
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
-        <IconButton
-          icon="arrow-left"
-          color="#B0C0F9"
-          size={0.035 * height}
-          style={{ marginLeft: width * -0.7 }}
-          onPress={() => navigation.navigate("Explore")}
-        />
-        <View style={styles.inputBox}>
-          <TextInput
-            placeholder="Enter keyword"
-            //value={keyword}
-            onChangeText={(text) => setKeyword(text)}
-            style={styles.input}
+      
+          <IconButton
+            icon="arrow-left"
+            color="#B0C0F9"
+            size={0.035 * height}
+            style={{ marginLeft: width * -0.7 }}
+            onPress={() => navigation.navigate("Explore")}
           />
-        </View>
+          <View style={styles.inputBox}>
+            <TextInput
+              placeholder="Enter User's Name or Email"
+              //value={keyword}
+              onChangeText={(text) => setKeyword(text)}
+              style={styles.input}
+            />
+          </View>
+
         <View style={styles.headerContainerHorizontal}>
-          <Text style={styles.header}>Search by Keyword</Text>
+          <Text style={styles.header}>Search by User</Text>
           {/* <TouchableOpacity
             onPress={() => handleSearch()}
             style={styles.button}
@@ -84,36 +82,22 @@ const KeywordSearchScreen = () => {
       <ScrollView style={styles.listingContainer}>
         {posts.length > 0 ? (
           posts
-            .filter((post) => post.listingName != null)
             .filter(
               (post) =>
                 keyword != "" &&
-                (post.listingName
+                (post.name
                   .toLowerCase()
                   .includes(keyword.toLowerCase()) ||
-                  post.category.toLowerCase().includes(keyword.toLowerCase()))
+                  post.email.toLowerCase().includes(keyword.toLowerCase()))
             )
             .map((post) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("View Listing", { listingId: post.key })
-                }
-              >
-                <View key={post.listingName} style={styles.listing}>
-                  {/* temporary image for testing purposes */}
-                  <Image source={logo} style={styles.appLogo} />
-                  <View style={styles.listingTextContainer}>
-                    <Text style={styles.listingTitle}>{post.listingName}</Text>
-                    <Text style={styles.listingText}>
-                      {post.listingDescription}
-                    </Text>
-                    <Text style={styles.listingText}>{post.category}</Text>
-                    <Text style={styles.listingCreator}>
-                      Created by {post.username}
-                    </Text>
-                  </View>
+              <View key={post.uid} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  <Text style={styles.listingTitle}>{post.name}</Text>
                 </View>
-              </TouchableOpacity>
+              </View>
             ))
         ) : (
           <Text>no posts yet</Text>
@@ -145,7 +129,7 @@ const KeywordSearchScreen = () => {
   );
 };
 
-export default KeywordSearchScreen;
+export default UserSearchScreen;
 
 const styles = StyleSheet.create({
   appLogo: {
@@ -183,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: 0.8 * width,
-    marginLeft: 0.075 * width,
+    marginLeft: 0.075 * width
   },
   header: {
     fontFamily: "raleway-bold",
