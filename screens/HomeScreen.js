@@ -79,6 +79,7 @@ const HomeScreen = () => {
         <Text style={styles.header}>Welcome to ezShare!</Text>
       </View>
     );
+
   }
 
   return (
@@ -195,7 +196,8 @@ const HomeScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.replace("Explore")}
+            onPress={() => navigation.navigate("Explore")}
+
           />
           <IconButton
             icon="account"

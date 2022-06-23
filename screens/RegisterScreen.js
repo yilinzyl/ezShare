@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { firestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -50,6 +50,11 @@ const RegisterScreen = () => {
         .then((userCredentials) => {
           const user = userCredentials.user;
           console.log("Registered with", user.email);
+          db.collection("users").doc(user.uid).set({
+            name: name,
+            userid: user.uid,
+            email: user.email,
+          });
           return user.updateProfile({
             displayName: name,
           });

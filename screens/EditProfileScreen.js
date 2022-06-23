@@ -49,6 +49,7 @@ const EditProfileScreen = () => {
           ? user.updateEmail(email)
           : console.log("email not changed")
       )
+      .then(db.collection("users").doc(user.uid).set({ name: name, userid: user.uid, email: user.email }))
       .then(() => navigation.navigate("Profile"));
   return (
     <View style={styles.background}>

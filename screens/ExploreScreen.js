@@ -65,7 +65,7 @@ const ExploreScreen = () => {
               <Text style={styles.buttonText}>Search by Keyword</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => console.log("user pressed")}
+              onPress={() => navigation.navigate("User Search")}
               style={styles.button}
             >
               <Text style={styles.buttonText}>Search by User</Text>
