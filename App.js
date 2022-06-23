@@ -83,6 +83,31 @@ export default function App() {
             name="Password"
             component={PasswordScreen}
           />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="User Search"
+            component={UserSearchScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="View Listing"
+            component={ViewListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Join Listing"
+            component={JoinListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Track"
+            component={TrackScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Joiner Details"
+            component={JoinerDetails}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     );
