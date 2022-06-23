@@ -7,11 +7,6 @@ import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import ProfileScreen from "./screens/ProfileScreen";
-<<<<<<< HEAD
-import ListingScreen from "./screens/ListingScreen";
-import ExploreScreen from "./screens/ExploreScreen";
-import KeywordSearchScreen from "./screens/KeywordSearchScreen";
-=======
 import CreateListingScreen from "./screens/CreateListingScreen";
 import ExploreScreen from "./screens/ExploreScreen";
 import KeywordSearchScreen from "./screens/KeywordSearchScreen";
@@ -24,7 +19,6 @@ import UserSearchScreen from "./screens/UserSearchScreen";
 
 import TrackScreen from "./screens/TrackScreen";
 
->>>>>>> 1b98f13a8d8968cd24b411926bf690c97f0ea218
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import JoinerDetails from "./screens/JoinerDetailsScreen";
@@ -121,16 +115,7 @@ export default function App() {
             component={JoinerDetails}
 
           />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Explore"
-            component={ExploreScreen}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Keyword"
-            component={KeywordSearchScreen}
-          />
+
         </Stack.Navigator>
       </NavigationContainer>
     );

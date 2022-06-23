@@ -35,28 +35,6 @@ const HomeScreen = () => {
       .catch((error) => alert(error.message));
   };
 
-<<<<<<< HEAD
-  const [loading, setLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    const getPostsFromFirebase = [];
-    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        getPostsFromFirebase.push({
-          ...doc.data(),
-          key: doc.id,
-        });
-      });
-      setPosts(getPostsFromFirebase);
-      setLoading(false);
-    });
-    return () => subscriber();
-  }, []);
-
-  if (loading) {
-    return <Text> Welcome to ezShare! </Text>;
-=======
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);
   const [posts, setPosts] = useState([]);
@@ -101,7 +79,7 @@ const HomeScreen = () => {
         <Text style={styles.header}>Welcome to ezShare!</Text>
       </View>
     );
->>>>>>> 1b98f13a8d8968cd24b411926bf690c97f0ea218
+
   }
 
   return (
@@ -218,11 +196,8 @@ const HomeScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-<<<<<<< HEAD
             onPress={() => navigation.navigate("Explore")}
-=======
-            onPress={() => navigation.replace("Explore")}
->>>>>>> 1b98f13a8d8968cd24b411926bf690c97f0ea218
+
           />
           <IconButton
             icon="account"
