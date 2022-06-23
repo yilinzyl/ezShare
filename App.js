@@ -15,7 +15,10 @@ import EditProfileScreen from "./screens/EditProfileScreen";
 import JoinListingScreen from "./screens/JoinListingScreen";
 import ViewListingScreen from "./screens/ViewListingScreen";
 import PasswordScreen from "./screens/PasswordScreen";
+import UserSearchScreen from "./screens/UserSearchScreen";
+
 import TrackScreen from "./screens/TrackScreen";
+
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import JoinerDetails from "./screens/JoinerDetailsScreen";
@@ -89,6 +92,10 @@ export default function App() {
           />
           <Stack.Screen
             options={{ headerShown: false }}
+
+            name="User Search"
+            component={UserSearchScreen}
+
             name="View Listing"
             component={ViewListingScreen}
           />
@@ -106,6 +113,7 @@ export default function App() {
             options={{ headerShown: false }}
             name="Joiner Details"
             component={JoinerDetails}
+
           />
         </Stack.Navigator>
       </NavigationContainer>
