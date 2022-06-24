@@ -16,7 +16,7 @@ import { auth, db } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Loader from "react-native-modal-loader";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -40,10 +40,14 @@ const JoinListingScreen = ({ route, navigation }) => {
   const [currentAmount, setCurrentAmount] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
   const [status, setStatus] = useState("");
+  const [errorFields, setErrorFields] = useState([]);
+  const [errorMessages, setErrorMessages] = useState({});
+  const [posting, setPosting] = useState(false);
 
   const addToJoinedDatabase = () => {
     db.collection("joined")
-      .add({
+      .doc(listingId + "-" + user.uid)
+      .set({
         listingID: listingId,
         userID: user.uid,
         username: user.displayName,
@@ -56,9 +60,13 @@ const JoinListingScreen = ({ route, navigation }) => {
         collected: false,
         paid: false,
         approved: false,
+        paymentProof: "",
+        deliveryProof: "",
+        completed: false,
       })
       .then(() => {
         console.log("Joined Data Added!");
+        navigation.navigate("Explore");
       });
   };
 
@@ -72,6 +80,40 @@ const JoinListingScreen = ({ route, navigation }) => {
       .then(() => {
         console.log("Listing updated!");
       });
+  };
+
+  const handleJoinButton = () => {
+    if (currentAmount + itemCost >= targetAmount) {
+      setStatus("Accepting Orders - Target reached");
+    }
+
+    const nowErrorFields = [];
+    const nowErrorMessages = {};
+    if (itemName == "") {
+      nowErrorFields.push("itemName");
+      nowErrorMessages["itemName"] = "Required Field";
+    }
+    if (itemLink == "") {
+      nowErrorFields.push("itemLink");
+      nowErrorMessages["itemLink"] = "Required Field";
+    }
+    if (itemDescription == "") {
+      nowErrorFields.push("itemDescription");
+      nowErrorMessages["itemDescription"] = "Required Field";
+    }
+    if (itemCost == "") {
+      nowErrorFields.push("itemCost");
+      nowErrorMessages["itemCost"] = "Required Field";
+    }
+
+    setErrorFields(nowErrorFields);
+    setErrorMessages(nowErrorMessages);
+
+    if (nowErrorFields.length == 0) {
+      setPosting(true);
+      addToJoinedDatabase();
+      updateListingDatabase();
+    }
   };
 
   const exitCreatePopup = () =>
@@ -92,8 +134,9 @@ const JoinListingScreen = ({ route, navigation }) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
         setTargetAmount(listingData.targetAmount);
-        setOtherCosts(listingData.otherCosts);
-        setDeliveryFee(listingData.deliveryFee);
+        setOtherCosts(Number(listingData.otherCosts));
+        setDeliveryFee(Number(listingData.deliveryFee));
+        console.log(typeof deliveryFee);
         setCurrentAmount(listingData.currentAmount);
         setStatus(listingData.status);
         setLoading(false);
@@ -110,6 +153,7 @@ const JoinListingScreen = ({ route, navigation }) => {
   } else {
     return (
       <View style={styles.background}>
+        <Loader loading={posting} color="#ff66be" />
         <View style={styles.headerContainer}>
           <IconButton
             icon="arrow-left"
@@ -119,12 +163,28 @@ const JoinListingScreen = ({ route, navigation }) => {
             onPress={exitCreatePopup}
           />
           <View>
-            <Text style={styles.header}>Join {listingName}</Text>
+            <Text style={styles.header}>
+              <Text style={{ color: "#696969" }}>Join: </Text> {listingName}
+            </Text>
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
-          <Text style={styles.inputHeader}>Item Name</Text>
-          <View style={styles.inputBox}>
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Item Name</Text>
+            {errorFields.includes("itemName") && (
+              <Text style={styles.warning}>{errorMessages["itemName"]}</Text>
+            )}
+          </View>
+          <View
+            style={[
+              styles.inputBox,
+              {
+                borderColor: errorFields.includes("itemName")
+                  ? "red"
+                  : "#B0C0F9",
+              },
+            ]}
+          >
             <TextInput
               placeholder="Enter Name"
               value={itemName}
@@ -132,8 +192,22 @@ const JoinListingScreen = ({ route, navigation }) => {
               style={styles.input}
             />
           </View>
-          <Text style={styles.inputHeader}>Add Item URL</Text>
-          <View style={styles.inputBox}>
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Add Item URL</Text>
+            {errorFields.includes("itemLink") && (
+              <Text style={styles.warning}>{errorMessages["itemLink"]}</Text>
+            )}
+          </View>
+          <View
+            style={[
+              styles.inputBox,
+              {
+                borderColor: errorFields.includes("itemLink")
+                  ? "red"
+                  : "#B0C0F9",
+              },
+            ]}
+          >
             <TextInput
               placeholder="Enter Item URL"
               value={itemLink}
@@ -141,32 +215,70 @@ const JoinListingScreen = ({ route, navigation }) => {
               style={styles.input}
             />
           </View>
-          <Text style={styles.inputHeader}>Description</Text>
-          <View style={styles.inputBox}>
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Item Details</Text>
+            {errorFields.includes("itemDescription") && (
+              <Text style={styles.warning}>
+                {errorMessages["itemDescription"]}
+              </Text>
+            )}
+          </View>
+          <View
+            style={[
+              styles.inputBoxBig,
+              {
+                borderColor: errorFields.includes("itemDescription")
+                  ? "red"
+                  : "#B0C0F9",
+              },
+            ]}
+          >
             <TextInput
-              placeholder="Enter Item Description"
+              placeholder="Enter details (eg. quantity, size, colour)"
               value={itemDescription}
               onChangeText={(text) => setItemDescription(text)}
               style={styles.input}
             />
           </View>
-          <Text style={styles.inputHeader}>Item Cost</Text>
-          <View style={styles.inputBox}>
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Item Cost</Text>
+            {errorFields.includes("itemCost") && (
+              <Text style={styles.warning}>{errorMessages["itemCost"]}</Text>
+            )}
+          </View>
+          <View
+            style={[
+              styles.inputBox,
+              {
+                borderColor: errorFields.includes("itemCost")
+                  ? "red"
+                  : "#B0C0F9",
+              },
+            ]}
+          >
             <TextInput
               placeholder="Enter Cost"
               keyboardType="numeric"
               value={itemCost}
-              onChangeText={(text) => setItemCost(text)}
+              onChangeText={(text) => {
+                const numericRegex = /^([.,0-9]{0,100})+$/;
+                if (numericRegex.test(text)) {
+                  setItemCost(text);
+                }
+              }}
               style={styles.input}
             />
           </View>
           <Text style={styles.info}>Delivery Fee: {deliveryFee}</Text>
           <Text style={styles.info}>Commission Fee: {otherCosts}</Text>
           <Text style={styles.info}>
-            Total Cost: {itemCost + deliveryFee + otherCosts}
+            Total Cost:{" "}
+            {parseFloat(itemCost) +
+              parseFloat(deliveryFee) +
+              parseFloat(otherCosts)}
           </Text>
           <Text style={styles.inputHeader}>Other Requests</Text>
-          <View style={styles.inputBox}>
+          <View style={styles.inputBoxBig}>
             <TextInput
               placeholder="Enter Other Requests"
               value={otherRequests}
@@ -175,14 +287,7 @@ const JoinListingScreen = ({ route, navigation }) => {
             />
           </View>
           <TouchableOpacity
-            onPress={() => {
-              if (currentAmount + itemCost >= targetAmount) {
-                setStatus("Accepting Orders - Target reached");
-              }
-              addToJoinedDatabase();
-              updateListingDatabase();
-              navigation.navigate("Home");
-            }}
+            onPress={handleJoinButton}
             style={styles.createButton}
           >
             <Text style={styles.buttonText}>Confirm</Text>
@@ -198,14 +303,16 @@ export default JoinListingScreen;
 
 const styles = StyleSheet.create({
   background: {
+    flex: 1,
     backgroundColor: "white",
   },
   headerContainer: {
+    flexWrap: "wrap",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    height: height * 0.15,
+    marginTop: height * 0.05,
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
     marginBottom: height * 0.02,
@@ -221,6 +328,12 @@ const styles = StyleSheet.create({
   listingContainer: {
     height: height * 0.87,
   },
+  listingTitleAndErrorContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
   inputBox: {
     borderColor: "#B0C0F9",
     borderWidth: 2,
@@ -231,10 +344,26 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
   },
+  inputBoxBig: {
+    borderColor: "#B0C0F9",
+    borderWidth: 2,
+    borderRadius: 10,
+    width: width * 0.9,
+    height: height * 0.2,
+    marginBottom: 13,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
+  },
   input: {
     fontFamily: "raleway-regular",
     fontSize: 16,
     margin: 6,
+  },
+  warning: {
+    fontFamily: "raleway-regular",
+    fontSize: 12,
+    marginRight: width * 0.05,
+    color: "red",
   },
   inputHeader: {
     fontFamily: "raleway-bold",

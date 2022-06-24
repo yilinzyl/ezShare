@@ -225,9 +225,11 @@ export default TrackScreen;
 
 const styles = StyleSheet.create({
   background: {
+    flex: 1,
     backgroundColor: "white",
   },
   headerContainer: {
+    flexWrap: "wrap",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
