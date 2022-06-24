@@ -41,8 +41,8 @@ const CreateListingScreen = () => {
   const [posting, setPosting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentDetails, setPaymentDetails] = useState("");
-
   const [catOpen, setCatOpen] = useState(false);
+  
   const categoryOptions = [
     { label: "Food", value: "Food" },
     { label: "Fashion", value: "Fashion" },
