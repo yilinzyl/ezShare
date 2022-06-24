@@ -8,11 +8,11 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -28,6 +28,13 @@ const ExploreScreen = () => {
   const [posts, setPosts] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("Find something that interests you");
+  const [images, setImages] = useState({});
+
+  const getImage = (listingId) => {
+    return cloudStorage
+      .ref("listingImages/" + listingId + ".jpg")
+      .getDownloadURL();
+  };
 
   useEffect(() => {
     const getPostsFromFirebase = [];
@@ -41,9 +48,79 @@ const ExploreScreen = () => {
       setPosts(getPostsFromFirebase);
       setLoading(false);
     });
-
     return () => subscriber();
   }, []);
+
+  useEffect(() => {
+    const getImagesFromFirebase = {};
+    let numImages = 0;
+    let currImages = 0;
+    if (!loading) {
+      posts.forEach((doc) => {
+        if (doc.imagePresent) {
+          numImages++;
+          getImage(doc.key)
+            .then((uid) => {
+              currImages++;
+              getImagesFromFirebase[doc.key] = uid;
+              console.log("done");
+              if (numImages == currImages) {
+                setImages(getImagesFromFirebase);
+              }
+            })
+            .catch((e) => {
+              currImages++;
+              getImagesFromFirebase[doc.key] =
+                Image.resolveAssetSource(logo).uri;
+              console.log("error");
+              if (numImages == currImages) {
+                console.log(getImagesFromFirebase);
+                setImages(getImagesFromFirebase);
+                console.log(images);
+              }
+            });
+        }
+      });
+    }
+  }, []);
+
+  // useEffect(() => {
+  //   const getImagesFromFirebase = {};
+  //   let numImages = 0;
+  //   let currImages = 0;
+
+  //   const getImage = async (listingId) => {
+  //     // try {
+  //     console.log("defined");
+  //     const uid = await cloudStorage
+  //       .ref("listingImages/" + listingId + ".jpg")
+  //       .getDownloadURL();
+  //     getImagesFromFirebase[listingId] = uid;
+  //     console.log(uid);
+  //     currImages++;
+  //     if (numImages == currImages) {
+  //       console.log(getImagesFromFirebase);
+  //       setImages(getImagesFromFirebase);
+  //       console.log(images);
+  //     }
+  //     // } catch (err) {
+  //     //   getImagesFromFirebase[listingId] = Image.resolveAssetSource(logo).uri;
+  //     //   currImages++;
+  //     //   if (numImages == currImages) {
+  //     //     console.log(getImagesFromFirebase);
+  //     //     setImages(getImagesFromFirebase);
+  //     //     console.log(images);
+  //     //   }
+  //     // }
+  //   };
+
+  //   if (!loading) {
+  //     posts.forEach((doc) => {
+  //       getImage(doc.key);
+  //       numImages++;
+  //     });
+  //   }
+  // }, []);
 
   const handleFood = () => setCategory("Food");
   const handleFashion = () => setCategory("Fashion");
@@ -118,25 +195,39 @@ const ExploreScreen = () => {
         <Text style={styles.catNameText}>{category}</Text>
         {posts.length > 0 ? (
           posts
-            .filter((post) => post.listingName != null)
+            .filter((post) => post.listingName != null && post.acceptingOrders)
             .filter(
               (post) =>
                 post.category.toLowerCase().includes(category.toLowerCase()) ||
                 category == "Find something that interests you"
             )
             .map((post) => (
-              <View key={post.listingName} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
-                  <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("View Listing", { listingId: post.key })
+                }
+              >
+                <View key={post.listingName} style={styles.listing}>
+                  {/* temporary image for testing purposes */}
+                  {post.imagePresent && (
+                    <Image
+                      source={{ uri: images[post.key] }}
+                      style={styles.appLogo}
+                    />
+                  )}
+                  {!post.imagePresent && (
+                    <Image source={logo} style={styles.appLogo} />
+                  )}
+                  <View style={styles.listingTextContainer}>
+                    <Text style={styles.listingTitle}>{post.listingName}</Text>
+                    <Text style={styles.listingText}>
+                      {post.listingDescription}
+                    </Text>
+                    <Text style={styles.listingText}>{post.category}</Text>
+                    <Text style={styles.listingCreator}>
+                      Created by {post.username}
+                    </Text>
+                  </View>
                 </View>
               </View>
             ))

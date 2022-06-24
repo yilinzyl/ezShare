@@ -82,7 +82,7 @@ const KeywordSearchScreen = () => {
       <ScrollView style={styles.listingContainer}>
         {posts.length > 0 ? (
           posts
-            .filter((post) => post.listingName != null)
+            .filter((post) => post.listingName != null && post.acceptingOrders)
             .filter(
               (post) =>
                 keyword != "" &&
