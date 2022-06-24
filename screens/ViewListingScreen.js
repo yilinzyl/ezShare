@@ -12,12 +12,12 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -46,9 +46,30 @@ const ViewListingScreen = ({ route, navigation }) => {
   const [status, setStatus] = useState("");
   const [listingOwner, setListingOwner] = useState("");
   const [listingOwnerName, setListingOwnerName] = useState("");
+  const [image, setImage] = useState(logo);
+  const [imagePresent, setImagePresent] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentDetails, setPaymentDetails] = useState("");
+  const [approved, setApproved] = useState(false);
+  const [joinedId, setJoinedId] = useState("");
+
+  const getImage = (listingId) => {
+    cloudStorage
+      .ref("listingImages/" + listingId + ".jpg")
+      .getDownloadURL()
+      .then((url) => {
+        setImage(url);
+        setImageLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
 
   useEffect(() => {
-    const subscriber = db
+    getImage(listingId);
+    const subscriber1 = db
       .collection("listing")
       .doc(listingId)
       .onSnapshot((documentSnapshot) => {
@@ -71,9 +92,31 @@ const ViewListingScreen = ({ route, navigation }) => {
         setStatus(listingData.status);
         setListingOwner(listingData.user);
         setListingOwnerName(listingData.username);
+        setImagePresent(listingData.imagePresent);
+        setPaymentMethod(
+          listingData.paymentMethod == "banking"
+            ? "Paylah/Paynow"
+            : listingData.paymentMethod
+        );
+        setPaymentDetails(listingData.paymentDetails);
         setLoading(false);
       });
-    return () => subscriber();
+
+    const subscriber2 = db
+      .collection("joined")
+      .doc(listingId + "-" + user.uid)
+      .onSnapshot((documentSnapshot) => {
+        if (documentSnapshot.exists) {
+          setJoinedId(listingId + "-" + user.uid);
+          setApproved(documentSnapshot.data().approved);
+        } else {
+        }
+      });
+
+    return () => {
+      subscriber1();
+      subscriber2();
+    };
   }, ["listingId"]);
 
   if (loading) {
@@ -100,7 +143,17 @@ const ViewListingScreen = ({ route, navigation }) => {
         </View>
         <ScrollView style={styles.listingContainer}>
           <View style={styles.imageContainer}>
-            <Image source={logo} />
+            {imageLoading && (
+              <Image style={{ width: 250, height: 250 }} source={logo} />
+            )}
+            {!imageLoading && (
+              <Image
+                style={{ width: 250, height: 250 }}
+                source={{
+                  uri: image,
+                }}
+              />
+            )}
           </View>
           <Text style={styles.infoHeader}>Category</Text>
           <Text style={styles.info}>{category}</Text>
@@ -110,20 +163,30 @@ const ViewListingScreen = ({ route, navigation }) => {
           <Text style={styles.info}>{description}</Text>
           <Text style={styles.infoHeader}>Cut-off Date</Text>
           <Text style={styles.info}>{cutOffDate.toString()}</Text>
-          <Text style={styles.infoHeader}>Target Amount</Text>
-          <Text style={styles.info}>{targetAmount}</Text>
-          <Text style={styles.infoHeader}>Current Amount</Text>
-          <Text style={styles.info}>{currentAmount}</Text>
+          <Text style={styles.infoHeader}>Current / Target Amount</Text>
+          <Text style={styles.info}>
+            {currentAmount} / {targetAmount} S$
+          </Text>
           <Text style={styles.infoHeader}>Delivery Fee</Text>
           <Text style={styles.info}>{deliveryFee}</Text>
           <Text style={styles.infoHeader}>Commission Fee</Text>
           <Text style={styles.info}>{otherCosts}</Text>
           <Text style={styles.infoHeader}>Collection Point</Text>
           <Text style={styles.info}>{collectionPoint}</Text>
-          {acceptingOrders && user.uid != listingOwner && (
+          <Text style={styles.infoHeader}>Payment Method</Text>
+          <Text style={styles.info}>{paymentMethod}</Text>
+          {approved && (
+            <View>
+              <Text style={styles.infoHeader}>Payment Details</Text>
+              <Text style={styles.info}>{paymentDetails}</Text>
+            </View>
+          )}
+          {acceptingOrders && user.uid != listingOwner && joinedId == "" && (
             <TouchableOpacity
               onPress={() =>
-                navigation.navigate("Join Listing", { listingId: listingId })
+                navigation.navigate("Join Listing", {
+                  listingId: listingId,
+                })
               }
               style={styles.joinButton}
             >
@@ -138,6 +201,19 @@ const ViewListingScreen = ({ route, navigation }) => {
               style={styles.joinButton}
             >
               <Text style={styles.buttonText}>Track</Text>
+            </TouchableOpacity>
+          )}
+          {user.uid != listingOwner && joinedId != "" && (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Joiner Details", {
+                  listingId: listingId,
+                  joinedId: joinedId,
+                })
+              }
+              style={styles.joinButton}
+            >
+              <Text style={styles.buttonText}>View Order</Text>
             </TouchableOpacity>
           )}
           <View style={styles.buttonBottom}></View>
@@ -155,6 +231,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerContainer: {
+    flexWrap: "wrap",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -172,7 +249,7 @@ const styles = StyleSheet.create({
     color: "#B0C0F9",
     textAlign: "right",
     fontFamily: "raleway-bold",
-    fontSize: 15,
+    fontSize: (30 * width) / height,
   },
   name: {
     fontFamily: "raleway-bold",
