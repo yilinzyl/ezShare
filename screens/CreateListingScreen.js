@@ -29,7 +29,6 @@ const CreateListingScreen = () => {
   const user = auth.currentUser;
   const [category, setCategory] = useState("");
   const [listingName, setListingName] = useState("");
-  const [imageURL, setImageURL] = useState("");
   const [description, setDescription] = useState("");
   const [cutOffDate, setCutOffDate] = useState("Select");
   const [targetAmount, setTargetAmount] = useState("");
@@ -40,8 +39,10 @@ const CreateListingScreen = () => {
   const [errorMessages, setErrorMessages] = useState({});
   const [image, setImage] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentDetails, setPaymentDetails] = useState("");
 
-  const [open, setOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
   const categoryOptions = [
     { label: "Food", value: "Food" },
     { label: "Fashion", value: "Fashion" },
@@ -49,6 +50,12 @@ const CreateListingScreen = () => {
     { label: "Electronics", value: "Electronics" },
     { label: "Entertainment", value: "Entertainment" },
     { label: "Others", value: "Others" },
+  ];
+
+  const [payOpen, setPayOpen] = useState(false);
+  const paymentOptions = [
+    { label: "Cash on Collection", value: "cash" },
+    { label: "Paylah/Paynow", value: "banking" },
   ];
 
   const navigation = useNavigation();
@@ -96,6 +103,14 @@ const CreateListingScreen = () => {
       nowErrorFields.push("collectionPoint");
       nowErrorMessages["collectionPoint"] = "Required Field";
     }
+    if (paymentMethod == "") {
+      nowErrorFields.push("paymentMethod");
+      nowErrorMessages["paymentMethod"] = "Required Field";
+    }
+    if (paymentMethod == "banking" && paymentDetails == "") {
+      nowErrorFields.push("paymentDetails");
+      nowErrorMessages["paymentDetails"] = "Required for this payment method";
+    }
 
     setErrorFields(nowErrorFields);
     setErrorMessages(nowErrorMessages);
@@ -107,7 +122,6 @@ const CreateListingScreen = () => {
           category: category,
           collectionPoint: collectionPoint,
           cutOffDate: cutOffDate,
-          imageUrl: imageURL,
           listDate: new Date(),
           listingDescription: description,
           listingName: listingName,
@@ -123,6 +137,8 @@ const CreateListingScreen = () => {
           readyForCollection: false,
           closed: false,
           imagePresent: image != null,
+          paymentMethod: paymentMethod,
+          paymentDetails: paymentDetails,
         })
         .then((docRef) => {
           if (image != null) {
@@ -280,10 +296,10 @@ const CreateListingScreen = () => {
           dropDownContainerStyle={styles.dropdownContainer}
           labelStyle={styles.input}
           listItemLabelStyle={styles.input}
-          open={open}
+          open={catOpen}
           value={category}
           items={categoryOptions}
-          setOpen={setOpen}
+          setOpen={setCatOpen}
           setValue={setCategory}
           placeholder="Select Category"
           listMode="SCROLLVIEW"
@@ -444,6 +460,73 @@ const CreateListingScreen = () => {
             style={styles.input}
           />
         </View>
+        <View style={styles.listingTitleAndErrorContainer}>
+          <Text style={styles.inputHeader}>Payment Details</Text>
+          {errorFields.includes("paymentMethod") && (
+            <Text style={styles.warning}>{errorMessages["paymentMethod"]}</Text>
+          )}
+        </View>
+        <DropDownPicker
+          style={[
+            styles.dropdown,
+            {
+              borderColor: errorFields.includes("paymentMethod")
+                ? "red"
+                : "#B0C0F9",
+            },
+          ]}
+          dropDownContainerStyle={styles.dropdownContainer}
+          labelStyle={styles.input}
+          listItemLabelStyle={styles.input}
+          open={payOpen}
+          value={paymentMethod}
+          items={paymentOptions}
+          setOpen={setPayOpen}
+          setValue={setPaymentMethod}
+          placeholder="Select Payment Method"
+          listMode="SCROLLVIEW"
+          placeholderStyle={[styles.input, { color: "#A9A9A9" }]}
+        />
+        {paymentMethod == "banking" && (
+          <View>
+            {errorFields.includes("paymentDetails") && (
+              <Text style={[styles.warning, { marginLeft: width * 0.05 }]}>
+                {errorMessages["paymentDetails"]}
+              </Text>
+            )}
+            <View style={styles.listingTitleAndErrorContainer}>
+              <View
+                style={[
+                  styles.inputBox,
+                  {
+                    borderColor: errorFields.includes("paymentDetails")
+                      ? "red"
+                      : "#B0C0F9",
+                  },
+                ]}
+              >
+                <TextInput
+                  placeholder="Enter Payment Details"
+                  value={paymentDetails}
+                  onChangeText={(text) => setPaymentDetails(text)}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+            <Text
+              style={{
+                fontFamily: "raleway-regular",
+                fontSize: 10,
+                textAlign: "right",
+                marginRight: width * 0.05,
+                marginTop: -6,
+              }}
+            >
+              (shown only when joiner has been approved)
+            </Text>
+          </View>
+        )}
+
         <TouchableOpacity
           onPress={handleCreateListing}
           style={styles.createButton}
