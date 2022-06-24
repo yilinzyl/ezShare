@@ -142,7 +142,7 @@ const ExploreScreen = () => {
               <Text style={styles.buttonText}>Search by Keyword</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => console.log("user pressed")}
+              onPress={() => navigation.navigate("User Search")}
               style={styles.button}
             >
               <Text style={styles.buttonText}>Search by User</Text>
@@ -229,7 +229,7 @@ const ExploreScreen = () => {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
         ) : (
           <Text>no posts yet</Text>
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#b0c0f9",
-    height: 45 ,
+    height: 45,
     width: width * 0.4,
     borderRadius: 45,
     alignItems: "center",
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     borderColor: "#eeedff",
     borderTopWidth: 2,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   listingTextContainer: {
     marginLeft: 0.05 * width,
