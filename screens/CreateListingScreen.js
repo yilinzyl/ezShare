@@ -42,7 +42,7 @@ const CreateListingScreen = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentDetails, setPaymentDetails] = useState("");
   const [catOpen, setCatOpen] = useState(false);
-  
+
   const categoryOptions = [
     { label: "Food", value: "Food" },
     { label: "Fashion", value: "Fashion" },
@@ -139,6 +139,7 @@ const CreateListingScreen = () => {
           imagePresent: image != null,
           paymentMethod: paymentMethod,
           paymentDetails: paymentDetails,
+          issues: "",
         })
         .then((docRef) => {
           if (image != null) {

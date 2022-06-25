@@ -32,8 +32,11 @@ const TrackScreen = ({ route, navigation }) => {
   const [loadingJoinerInfo, setLoadingJoinerInfo] = useState(true);
   const [listingName, setListingName] = useState("");
   const [acceptingOrders, setAcceptingOrders] = useState("");
-  const [status, setStatus] = useState("");
+  const [oldStatus, setOldStatus] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [closed, setClosed] = useState(false);
   const [readyForCollection, setReadyForCollection] = useState(false);
+  const [readyForCollectionOld, setReadyForCollectionOld] = useState(false);
   const [joiners, setJoiners] = useState([]);
 
   const handleStopAcceptingOrders = () =>
@@ -85,11 +88,19 @@ const TrackScreen = ({ route, navigation }) => {
     db.collection("listing")
       .doc(listingId)
       .update({
-        status: status,
+        status: newStatus,
+        acceptingOrders: acceptingOrders,
+        readyForCollection: readyForCollection,
+        closed: closed,
       })
-      .then(() => {
-        console.log("Status updated!");
-      });
+      .then(() =>
+        Alert.alert("Status Updated!", "", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ])
+      );
   };
 
   useEffect(() => {
@@ -100,7 +111,9 @@ const TrackScreen = ({ route, navigation }) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
         setAcceptingOrders(listingData.acceptingOrders);
-        setStatus(listingData.status);
+        setOldStatus(listingData.status);
+        setClosed(listingData.closed);
+        setReadyForCollectionOld(listingData.readyForCollection);
         setReadyForCollection(listingData.readyForCollection);
         setLoadingListingInfo(false);
       });
@@ -143,34 +156,251 @@ const TrackScreen = ({ route, navigation }) => {
             onPress={() => navigation.goBack()}
           />
           <View>
-            <Text style={styles.header}>Track {listingName}</Text>
+            <Text style={styles.header}>
+              <Text style={{ color: "#696969" }}>Track: </Text> {listingName}
+            </Text>
           </View>
         </View>
-        <ScrollView style={styles.listingContainer}>
-          {acceptingOrders && (
-            <TouchableOpacity
-              onPress={handleStopAcceptingOrders}
-              style={styles.updateButton}
-            >
-              <Text style={styles.buttonText}>Stop Accepting Orders</Text>
-            </TouchableOpacity>
-          )}
-          {!readyForCollection && (
-            <TouchableOpacity
-              onPress={handleReadyToCollect}
-              style={styles.updateButton}
-            >
-              <Text style={styles.buttonText}>Ready to Collect</Text>
-            </TouchableOpacity>
-          )}
-          <Text style={styles.inputHeader}>Update Status</Text>
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Enter New Status"
-              value={status}
-              onChangeText={(text) => setStatus(text)}
-              style={styles.input}
-            />
+        <View style={styles.updateStatusContainer}>
+          <View style={styles.statusIconsContainer}>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="text-box-plus-outline"
+                color={
+                  oldStatus == "Accepting Orders - Target not reached"
+                    ? "black"
+                    : newStatus == "Accepting Orders - Target not reached"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Accepting Orders - Target not reached");
+                  setClosed(false);
+                  setAcceptingOrders(true);
+                  setReadyForCollection(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Accepting Orders - Target not reached"
+                        ? "black"
+                        : newStatus == "Accepting Orders - Target not reached"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Accepting Orders - Target not reached
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="text-box-check-outline"
+                color={
+                  oldStatus == "Accepting Orders - Target reached"
+                    ? "black"
+                    : newStatus == "Accepting Orders - Target reached"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Accepting Orders - Target reached");
+                  setClosed(false);
+                  setAcceptingOrders(true);
+                  setReadyForCollection(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Accepting Orders - Target reached"
+                        ? "black"
+                        : newStatus == "Accepting Orders - Target reached"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Accepting Orders - Target reached
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="text-box-remove-outline"
+                color={
+                  oldStatus == "Stopped Accepting Orders"
+                    ? "black"
+                    : newStatus == "Stopped Accepting Orders"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Stopped Accepting Orders");
+                  setAcceptingOrders(false);
+                  setClosed(false);
+                  setReadyForCollection(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Stopped Accepting Orders"
+                        ? "black"
+                        : newStatus == "Stopped Accepting Orders"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                No Longer Accepting Orders
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="cart"
+                color={
+                  oldStatus == "Orders Placed"
+                    ? "black"
+                    : newStatus == "Orders Placed"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Orders Placed");
+                  setAcceptingOrders(false);
+                  setClosed(false);
+                  setReadyForCollection(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Orders Placed"
+                        ? "black"
+                        : newStatus == "Orders Placed"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Orders Placed
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="airplane"
+                color={
+                  oldStatus == "Orders out for Delivery"
+                    ? "black"
+                    : newStatus == "Orders out for Delivery"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Orders out for Delivery");
+                  setAcceptingOrders(false);
+                  setClosed(false);
+                  setReadyForCollection(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Orders out for Delivery"
+                        ? "black"
+                        : newStatus == "Orders out for Delivery"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Orders out for Delivery
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="shopping"
+                color={
+                  oldStatus == "Ready for Collection"
+                    ? "black"
+                    : newStatus == "Ready for Collection"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Ready for Collection");
+                  setAcceptingOrders(false);
+                  setReadyForCollection(true);
+                  setClosed(false);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Ready for Collection"
+                        ? "black"
+                        : newStatus == "Ready for Collection"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Ready for Collection
+              </Text>
+            </View>
+            <View style={styles.eachStatus}>
+              <IconButton
+                icon="check-circle-outline"
+                color={
+                  oldStatus == "Group buy completed!"
+                    ? "black"
+                    : newStatus == "Group buy completed!"
+                    ? "#b0c0f9"
+                    : "#bababa"
+                }
+                size={0.09 * width}
+                onPress={() => {
+                  setNewStatus("Group buy completed!");
+                  setAcceptingOrders(false);
+                  setReadyForCollection(true);
+                  setClosed(true);
+                }}
+              />
+              <Text
+                style={[
+                  styles.statusText,
+                  {
+                    color:
+                      oldStatus == "Group buy completed!"
+                        ? "black"
+                        : newStatus == "Group buy completed!"
+                        ? "#b0c0f9"
+                        : "#bababa",
+                  },
+                ]}
+              >
+                Group buy completed!
+              </Text>
+            </View>
           </View>
           <TouchableOpacity
             onPress={handleUpdateStatus}
@@ -178,6 +408,9 @@ const TrackScreen = ({ route, navigation }) => {
           >
             <Text style={styles.buttonText}>Update</Text>
           </TouchableOpacity>
+          <View style={styles.buttonBottom}></View>
+        </View>
+        <ScrollView style={styles.listingContainer}>
           {joiners.length > 0 ? (
             joiners.map((joiner) => (
               <TouchableOpacity
@@ -190,30 +423,92 @@ const TrackScreen = ({ route, navigation }) => {
               >
                 <View key={joiner.key} style={styles.listing}>
                   <View style={styles.listingTextContainer}>
-                    <Text style={styles.listingTitle}>{joiner.itemName}</Text>
+                    <View style={styles.horizontalContainer}>
+                      <Text style={styles.listingTitle}>{joiner.itemName}</Text>
+                      <Text style={styles.listingCreator}>
+                        Joined by {joiner.username}
+                      </Text>
+                    </View>
                     <Text style={styles.listingText}>
                       {joiner.itemDescription}
                     </Text>
-                    <View style={styles.joinerStatusContainer}>
-                      {joiner.approved && (
+
+                    <View style={styles.statusContainer}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {joiner.approved && (
+                          <IconButton
+                            icon="checkbox-outline"
+                            size={0.035 * width}
+                          />
+                        )}
+                        {!joiner.approved && (
+                          <IconButton
+                            icon="checkbox-blank-outline"
+                            size={0.035 * width}
+                          />
+                        )}
+
                         <Text style={styles.listingText}>approved</Text>
-                      )}
-                      {joiner.paid && (
+                      </View>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {joiner.paid && (
+                          <IconButton
+                            icon="checkbox-outline"
+                            size={0.035 * width}
+                          />
+                        )}
+                        {!joiner.paid && (
+                          <IconButton
+                            icon="checkbox-blank-outline"
+                            size={0.035 * width}
+                          />
+                        )}
                         <Text style={styles.listingText}>paid</Text>
-                      )}
-                      {joiner.collected && (
+                      </View>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {joiner.collected && (
+                          <IconButton
+                            icon="checkbox-outline"
+                            size={0.035 * width}
+                          />
+                        )}
+                        {!joiner.collected && (
+                          <IconButton
+                            icon="checkbox-blank-outline"
+                            size={0.035 * width}
+                          />
+                        )}
                         <Text style={styles.listingText}>collected</Text>
-                      )}
+                      </View>
                     </View>
-                    <Text style={styles.listingCreator}>
-                      Joined by {joiner.username}
-                    </Text>
+                    {!joiner.approved && (
+                      <Text style={styles.actionText}>
+                        Action Required: Approve Joiner Now
+                      </Text>
+                    )}
+                    {!joiner.paid && joiner.paymentProof != "" && (
+                      <Text style={styles.actionText}>
+                        Action Required: Joiner has made payment. Verify payment
+                        now.
+                      </Text>
+                    )}
+                    {readyForCollectionOld && !joiner.collected && (
+                      <Text style={styles.actionText}>
+                        Action Required: Provide collection/mailing proof
+                      </Text>
+                    )}
                   </View>
                 </View>
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={{ marginLeft: width * 0.05 }}>no joiners yet</Text>
+            <Text style={styles.info}>no joiners yet</Text>
           )}
         </ScrollView>
       </View>
@@ -226,7 +521,7 @@ export default TrackScreen;
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#f9fafe",
   },
   headerContainer: {
     flexWrap: "wrap",
@@ -234,7 +529,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    height: height * 0.15,
+    marginTop: height * 0.05,
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
     marginBottom: height * 0.02,
@@ -247,23 +542,35 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     fontSize: (60 * width) / height,
   },
+  updateStatusContainer: {
+    height: height * 0.21,
+    backgroundColor: "#f9fafe",
+    alignItems: "center",
+  },
+  statusIconsContainer: {
+    width: width,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  eachStatus: {
+    flexDirection: "column",
+    alignItems: "center",
+    width: width * 0.13,
+  },
   listingContainer: {
-    height: height * 0.87,
+    flex: 1,
+    backgroundColor: "#f9fafe",
   },
-  inputBox: {
-    borderColor: "#B0C0F9",
-    borderWidth: 2,
-    borderRadius: 10,
-    width: width * 0.9,
-    height: height * 0.06,
-    marginBottom: 13,
-    marginLeft: width * 0.05,
-    marginRight: width * 0.05,
-  },
-  input: {
+  info: {
     fontFamily: "raleway-regular",
     fontSize: 16,
-    margin: 6,
+    marginLeft: width * 0.05,
+  },
+  statusText: {
+    fontFamily: "raleway-regular",
+    marginTop: height * -0.02,
+    fontSize: 9,
+    textAlign: "center",
   },
   inputHeader: {
     fontFamily: "raleway-bold",
@@ -271,13 +578,6 @@ const styles = StyleSheet.create({
     color: "#404040",
     margin: 6,
     marginLeft: width * 0.05,
-  },
-  info: {
-    fontFamily: "raleway-regular",
-    fontSize: 16,
-    marginRight: width * 0.05,
-    marginBottom: 1,
-    textAlign: "right",
   },
   updateButton: {
     backgroundColor: "#F898A3",
@@ -287,7 +587,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     justifyContent: "center",
-    marginTop: 19,
+    marginTop: 10,
     marginBottom: height * 0.03,
   },
   buttonText: {
@@ -307,9 +607,6 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
   },
-  buttonBottom: {
-    height: 0.05 * height,
-  },
   listing: {
     backgroundColor: "#f9fafe",
     height: height * 0.15,
@@ -321,13 +618,7 @@ const styles = StyleSheet.create({
   },
   listingTextContainer: {
     marginLeft: 0.05 * width,
-    width: 0.6 * width,
-    justifyContent: "flex-end",
-  },
-  joinerStatusContainer: {
-    marginRight: 0.05 * width,
-    width: 0.5 * width,
-    alignItems: "flex-end",
+    width: 0.9 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",
@@ -339,9 +630,24 @@ const styles = StyleSheet.create({
     color: "#707070",
     fontSize: (30 * width) / height,
   },
+  actionText: {
+    fontFamily: "raleway-regular",
+    color: "#F88379",
+    fontSize: (20 * width) / height,
+  },
   listingCreator: {
     fontFamily: "raleway-bold",
     color: "#B0C0F9",
     fontSize: (30 * width) / height,
+  },
+  horizontalContainer: {
+    flexDirection: "row",
+    width: width * 0.9,
+    justifyContent: "space-between",
+  },
+  statusContainer: {
+    flexDirection: "row",
+    width: width * 0.9,
+    justifyContent: "space-around",
   },
 });
