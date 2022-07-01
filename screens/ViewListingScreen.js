@@ -113,6 +113,10 @@ const ViewListingScreen = ({ route, navigation }) => {
         }
       });
 
+    if (user.uid == listingOwner) {
+      setApproved(true);
+    }
+
     return () => {
       subscriber1();
       subscriber2();

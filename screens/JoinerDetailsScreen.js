@@ -363,36 +363,60 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
-          {approved && (
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            {approved && (
               <IconButton
                 icon="checkbox-outline"
                 size={0.05 * width}
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
-              <Text style={styles.info}>approved</Text>
-            </View>
-          )}
-          {paid && (
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            )}
+            {!approved && (
+              <IconButton
+                icon="checkbox-blank-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            <Text style={styles.info}>approved</Text>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            {paid && (
               <IconButton
                 icon="checkbox-outline"
                 size={0.05 * width}
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
-              <Text style={styles.info}>paid</Text>
-            </View>
-          )}
-          {collected && (
-            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            )}
+            {!paid && (
+              <IconButton
+                icon="checkbox-blank-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            <Text style={styles.info}>paid</Text>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            {collected && (
               <IconButton
                 icon="checkbox-outline"
                 size={0.05 * width}
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
-              <Text style={styles.info}>collected</Text>
-            </View>
-          )}
+            )}
+            {!collected && (
+              <IconButton
+                icon="checkbox-blank-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            <Text style={styles.info}>collected</Text>
+          </View>
+
           <Text style={styles.infoHeader}>Item Name</Text>
           <Text style={styles.info}>{itemName}</Text>
           <Text style={styles.infoHeader}>Item Link</Text>

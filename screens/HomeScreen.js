@@ -110,9 +110,16 @@ const HomeScreen = () => {
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
                   <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.slice(0, 30)}...
+                    </Text>
+                  )}
                   <Text style={styles.listingText}>{post.category}</Text>
                   <Text style={styles.listingCreator}>
                     Created by {post.username}

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Image
+  Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
@@ -39,23 +39,21 @@ const MyListingsScreen = () => {
     navigation.navigate("Create Listing");
   };
 
-    useEffect(() => {
-      const getPostsFromFirebase = [];
-      const subscriber = db
-        .collection("listing")
-        .onSnapshot((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            getPostsFromFirebase.push({
-              ...doc.data(),
-              key: doc.id,
-            });
-          });
-          setPosts(getPostsFromFirebase);
-          setLoading(false);
+  useEffect(() => {
+    const getPostsFromFirebase = [];
+    const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        getPostsFromFirebase.push({
+          ...doc.data(),
+          key: doc.id,
         });
+      });
+      setPosts(getPostsFromFirebase);
+      setLoading(false);
+    });
 
-      return () => subscriber();
-    }, []);
+    return () => subscriber();
+  }, []);
 
   return (
     <View style={styles.background}>
@@ -98,9 +96,16 @@ const MyListingsScreen = () => {
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
                   <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.slice(0, 30)}...
+                    </Text>
+                  )}
                   <Text style={styles.listingText}>{post.category}</Text>
                   <Text style={styles.listingCreator}>
                     Created by {post.username}
@@ -109,7 +114,9 @@ const MyListingsScreen = () => {
               </View>
             ))
         ) : (
-          <Text style={styles.listingTitle}>You have not created any listings.</Text>
+          <Text style={styles.listingTitle}>
+            You have not created any listings.
+          </Text>
         )}
       </ScrollView>
       <View style={styles.footer}>
@@ -170,7 +177,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     borderRightColor: "#f2f2f2",
     borderRightWidth: 3,
-    backgroundColor: "#f9fafe"
+    backgroundColor: "#f9fafe",
   },
   optionsButton: {
     height: height * 0.07,
@@ -215,7 +222,7 @@ const styles = StyleSheet.create({
   subheaderContainer: {
     height: height * 0.07,
     justifyContent: "center",
-    backgroundColor: "#f9fafe"
+    backgroundColor: "#f9fafe",
   },
   subheader: {
     fontFamily: "raleway-bold",

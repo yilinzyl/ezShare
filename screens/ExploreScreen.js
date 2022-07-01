@@ -12,7 +12,8 @@ import { auth, db, cloudStorage } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
-import logo from "../assets/default-listing-icon.png";
+// import logo from "../assets/default-listing-icon.png";
+import logo from "../assets/lazada.jpg";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -209,20 +210,28 @@ const ExploreScreen = () => {
               >
                 <View key={post.listingName} style={styles.listing}>
                   {/* temporary image for testing purposes */}
-                  {post.imagePresent && (
+                  {/* {post.imagePresent && (
                     <Image
                       source={{ uri: images[post.key] }}
                       style={styles.appLogo}
                     />
-                  )}
-                  {!post.imagePresent && (
+                  )} */}
+                  {/* {!post.imagePresent && (
                     <Image source={logo} style={styles.appLogo} />
-                  )}
+                  )} */}
+                  <Image source={logo} style={styles.appLogo} />
                   <View style={styles.listingTextContainer}>
                     <Text style={styles.listingTitle}>{post.listingName}</Text>
-                    <Text style={styles.listingText}>
-                      {post.listingDescription}
-                    </Text>
+                    {post.listingDescription.length <= 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription}
+                      </Text>
+                    )}
+                    {post.listingDescription.length > 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription.slice(0, 30)}...
+                      </Text>
+                    )}
                     <Text style={styles.listingText}>{post.category}</Text>
                     <Text style={styles.listingCreator}>
                       Created by {post.username}
