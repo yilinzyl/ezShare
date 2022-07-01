@@ -393,6 +393,50 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.info}>collected</Text>
             </View>
           )}
+          <Text style={styles.infoHeader}>Item Name</Text>
+          <Text style={styles.info}>{itemName}</Text>
+          <Text style={styles.infoHeader}>Item Link</Text>
+          <Text
+            style={styles.hyperlink}
+            onPress={() => handleOpenURL(itemLink)}
+          >
+            {itemLink}
+          </Text>
+          <Text style={styles.infoHeader}>Item Description</Text>
+          <Text style={styles.info}>{itemDescription}</Text>
+          <Text style={styles.infoHeader}>Item Cost</Text>
+          <Text style={styles.info}>S$ {itemCost}</Text>
+          <Text style={styles.infoHeader}>Other Requests</Text>
+          <Text style={styles.info}>{otherRequests}</Text>
+          {hasPaymentProof && (
+            <View>
+              <Text style={styles.infoHeader}>Payment Proof</Text>
+              <Text style={styles.info}>{paymentProof}</Text>
+              <Image
+                source={{ uri: paymentImage }}
+                style={{
+                  width: 0.9 * width,
+                  height: 0.9 * width,
+                  alignSelf: "center",
+                }}
+              />
+            </View>
+          )}
+          {hasDeliveryProof && (
+            <View>
+              <Text style={styles.infoHeader}>Collection Proof</Text>
+              <Text style={styles.info}>{deliveryProof}</Text>
+              <Image
+                source={{ uri: deliveryImage }}
+                style={{
+                  width: 0.9 * width,
+                  height: 0.9 * width,
+                  alignSelf: "center",
+                }}
+              />
+            </View>
+          )}
+
           {user.uid == listingUserId && !approved && (
             <TouchableOpacity
               onPress={handleApproveButton}
@@ -401,7 +445,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.buttonText}>Approve Order</Text>
             </TouchableOpacity>
           )}
-          {user.uid == listingUserId && !paid && (
+          {user.uid == listingUserId && approved && !paid && (
             <TouchableOpacity
               onPress={handlePaidButton}
               style={styles.updateButton}
@@ -409,69 +453,72 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.buttonText}>Mark as Paid</Text>
             </TouchableOpacity>
           )}
-          {user.uid == listingUserId && !collected && !hasDeliveryProof && (
-            <View>
-              <View
-                style={{
-                  borderColor: "black",
-                  borderWidth: 1,
-                  marginLeft: width * 0.02,
-                  marginRight: width * 0.02,
-                  marginTop: height * 0.02,
-                  marginBottom: height * 0.02,
-                  alignItems: "center",
-                }}
-              >
+          {user.uid == listingUserId &&
+            approved &&
+            !collected &&
+            !hasDeliveryProof && (
+              <View>
                 <View
                   style={{
-                    marginTop: height * 0.05,
-                    flexDirection: "row",
-                    alignSelf: "center",
-                    justifyContent: "space-around",
+                    borderColor: "black",
+                    borderWidth: 1,
+                    marginLeft: width * 0.02,
+                    marginRight: width * 0.02,
+                    marginTop: height * 0.02,
+                    marginBottom: height * 0.02,
+                    alignItems: "center",
                   }}
                 >
-                  <View style={styles.inputBox}>
-                    <TextInput
-                      multiline
-                      placeholder="Comments"
-                      value={deliveryProof}
-                      onChangeText={(text) => setDeliveryProof(text)}
-                      style={styles.input}
+                  <View
+                    style={{
+                      marginTop: height * 0.05,
+                      flexDirection: "row",
+                      alignSelf: "center",
+                      justifyContent: "space-around",
+                    }}
+                  >
+                    <View style={styles.inputBox}>
+                      <TextInput
+                        multiline
+                        placeholder="Comments"
+                        value={deliveryProof}
+                        onChangeText={(text) => setDeliveryProof(text)}
+                        style={styles.input}
+                      />
+                    </View>
+                    <IconButton
+                      icon="camera"
+                      mode="contained-tonal"
+                      color="#B0C0F9"
+                      size={(60 * width) / height}
+                      onPress={takePhoto}
+                    />
+                    <IconButton
+                      icon="camera-burst"
+                      mode="contained-tonal"
+                      color="#B0C0F9"
+                      size={(60 * width) / height}
+                      onPress={pickImage}
                     />
                   </View>
-                  <IconButton
-                    icon="camera"
-                    mode="contained-tonal"
-                    color="#B0C0F9"
-                    size={(60 * width) / height}
-                    onPress={takePhoto}
-                  />
-                  <IconButton
-                    icon="camera-burst"
-                    mode="contained-tonal"
-                    color="#B0C0F9"
-                    size={(60 * width) / height}
-                    onPress={pickImage}
-                  />
+                  {image && (
+                    <Image
+                      source={{ uri: image }}
+                      style={{ width: 200, height: 200 }}
+                    />
+                  )}
+                  <TouchableOpacity
+                    onPress={handleDeliveryProofButton}
+                    style={styles.updateButton}
+                  >
+                    <Text style={styles.buttonText}>
+                      Provide Proof of Collection/ Mailing Proof to Joiner
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                {image && (
-                  <Image
-                    source={{ uri: image }}
-                    style={{ width: 200, height: 200 }}
-                  />
-                )}
-                <TouchableOpacity
-                  onPress={handleDeliveryProofButton}
-                  style={styles.updateButton}
-                >
-                  <Text style={styles.buttonText}>
-                    Provide Proof of Collection/ Mailing Proof to Joiner
-                  </Text>
-                </TouchableOpacity>
               </View>
-            </View>
-          )}
-          {user.uid == joinerId && !paid && !hasPaymentProof && (
+            )}
+          {user.uid == joinerId && approved && !paid && !hasPaymentProof && (
             <View>
               <View
                 style={{
@@ -531,7 +578,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               </View>
             </View>
           )}
-          {user.uid == joinerId && !collected && (
+          {user.uid == joinerId && approved && !collected && (
             <TouchableOpacity
               onPress={handleCollectedButton}
               style={styles.updateButton}
@@ -540,49 +587,6 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           )}
           <View style={styles.buttonBottom}></View>
-          <Text style={styles.infoHeader}>Item Name</Text>
-          <Text style={styles.info}>{itemName}</Text>
-          <Text style={styles.infoHeader}>Item Link</Text>
-          <Text
-            style={styles.hyperlink}
-            onPress={() => handleOpenURL(itemLink)}
-          >
-            {itemLink}
-          </Text>
-          <Text style={styles.infoHeader}>Item Description</Text>
-          <Text style={styles.info}>{itemDescription}</Text>
-          <Text style={styles.infoHeader}>Item Cost</Text>
-          <Text style={styles.info}>{itemCost}</Text>
-          <Text style={styles.infoHeader}>Other Requests</Text>
-          <Text style={styles.info}>{otherRequests}</Text>
-          {hasPaymentProof && (
-            <View>
-              <Text style={styles.infoHeader}>Payment Proof</Text>
-              <Text style={styles.info}>{paymentProof}</Text>
-              <Image
-                source={{ uri: paymentImage }}
-                style={{
-                  width: 0.9 * width,
-                  height: 0.9 * width,
-                  alignSelf: "center",
-                }}
-              />
-            </View>
-          )}
-          {hasDeliveryProof && (
-            <View>
-              <Text style={styles.infoHeader}>Collection Proof</Text>
-              <Text style={styles.info}>{deliveryProof}</Text>
-              <Image
-                source={{ uri: deliveryImage }}
-                style={{
-                  width: 0.9 * width,
-                  height: 0.9 * width,
-                  alignSelf: "center",
-                }}
-              />
-            </View>
-          )}
         </ScrollView>
       </View>
     );
@@ -628,6 +632,7 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-regular",
     fontSize: 16,
     marginLeft: width * 0.05,
+    marginRight: width * 0.05,
     marginBottom: 15,
   },
   inputBox: {

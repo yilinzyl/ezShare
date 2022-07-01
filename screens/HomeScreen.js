@@ -60,7 +60,7 @@ const HomeScreen = () => {
       .onSnapshot((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const joinedData = doc.data();
-          if (user.uid == joinedData.userID) {
+          if (user.uid == joinedData.userID && !joinedData.completed) {
             getListingIdsFromFirebase.push(joinedData.listingID);
           }
         });

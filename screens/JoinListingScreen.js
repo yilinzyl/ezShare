@@ -63,6 +63,8 @@ const JoinListingScreen = ({ route, navigation }) => {
         paymentProof: "",
         deliveryProof: "",
         completed: false,
+        declined: false,
+        issues: "",
       })
       .then(() => {
         console.log("Joined Data Added!");
@@ -74,8 +76,12 @@ const JoinListingScreen = ({ route, navigation }) => {
     db.collection("listing")
       .doc(listingId)
       .update({
-        currentAmount: currentAmount + itemCost,
-        status: status,
+        currentAmount: parseFloat(currentAmount) + parseFloat(itemCost),
+        status:
+          parseFloat(currentAmount) + parseFloat(itemCost) >=
+          parseFloat(targetAmount)
+            ? "Accepting Orders - Target reached"
+            : status,
       })
       .then(() => {
         console.log("Listing updated!");
@@ -83,10 +89,6 @@ const JoinListingScreen = ({ route, navigation }) => {
   };
 
   const handleJoinButton = () => {
-    if (currentAmount + itemCost >= targetAmount) {
-      setStatus("Accepting Orders - Target reached");
-    }
-
     const nowErrorFields = [];
     const nowErrorMessages = {};
     if (itemName == "") {
@@ -257,7 +259,7 @@ const JoinListingScreen = ({ route, navigation }) => {
             ]}
           >
             <TextInput
-              placeholder="Enter Cost"
+              placeholder="S$"
               keyboardType="numeric"
               value={itemCost}
               onChangeText={(text) => {
@@ -269,14 +271,21 @@ const JoinListingScreen = ({ route, navigation }) => {
               style={styles.input}
             />
           </View>
-          <Text style={styles.info}>Delivery Fee: {deliveryFee}</Text>
-          <Text style={styles.info}>Commission Fee: {otherCosts}</Text>
-          <Text style={styles.info}>
-            Total Cost:{" "}
-            {parseFloat(itemCost) +
-              parseFloat(deliveryFee) +
-              parseFloat(otherCosts)}
-          </Text>
+          <Text style={styles.info}>Delivery Fee: S${deliveryFee}</Text>
+          <Text style={styles.info}>Commission Fee: S${otherCosts}</Text>
+          {itemCost != "" && (
+            <Text style={styles.info}>
+              Total Cost: S$
+              {parseFloat(itemCost) +
+                parseFloat(deliveryFee) +
+                parseFloat(otherCosts)}
+            </Text>
+          )}
+          {itemCost == "" && (
+            <Text style={styles.info}>
+              Total Cost: S${parseFloat(deliveryFee) + parseFloat(otherCosts)}
+            </Text>
+          )}
           <Text style={styles.inputHeader}>Other Requests</Text>
           <View style={styles.inputBoxBig}>
             <TextInput

@@ -168,9 +168,9 @@ const ViewListingScreen = ({ route, navigation }) => {
             {currentAmount} / {targetAmount} S$
           </Text>
           <Text style={styles.infoHeader}>Delivery Fee</Text>
-          <Text style={styles.info}>{deliveryFee}</Text>
+          <Text style={styles.info}>S$ {deliveryFee}</Text>
           <Text style={styles.infoHeader}>Commission Fee</Text>
-          <Text style={styles.info}>{otherCosts}</Text>
+          <Text style={styles.info}>S$ {otherCosts}</Text>
           <Text style={styles.infoHeader}>Collection Point</Text>
           <Text style={styles.info}>{collectionPoint}</Text>
           <Text style={styles.infoHeader}>Payment Method</Text>
@@ -261,6 +261,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: width * 0.05,
     marginBottom: 15,
+    marginRight: width * 0.05,
   },
   infoHeader: {
     fontFamily: "raleway-bold",
