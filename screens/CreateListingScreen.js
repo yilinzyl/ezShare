@@ -128,7 +128,6 @@ const CreateListingScreen = () => {
           otherCosts: Number(otherCosts),
           deliveryFee: Number(deliveryFee),
           targetAmount: Number(targetAmount),
-          amountReached: 0,
           user: user.uid,
           username: user.displayName,
           currentAmount: 0,
@@ -436,7 +435,7 @@ const CreateListingScreen = () => {
           />
         </View>
         <View style={styles.listingTitleAndErrorContainer}>
-          <Text style={styles.inputHeader}>Collection Point</Text>
+          <Text style={styles.inputHeader}>Collection Details</Text>
           {errorFields.includes("collectionPoint") && (
             <Text style={styles.warning}>
               {errorMessages["collectionPoint"]}
@@ -445,7 +444,7 @@ const CreateListingScreen = () => {
         </View>
         <View
           style={[
-            styles.inputBox,
+            styles.inputBoxBig,
             {
               borderColor: errorFields.includes("collectionPoint")
                 ? "red"
@@ -455,7 +454,7 @@ const CreateListingScreen = () => {
         >
           <TextInput
             multiline
-            placeholder="Enter Collection Point"
+            placeholder="Enter Collection Details (eg. normal mail/self collect at collection point, contact)"
             value={collectionPoint}
             onChangeText={(text) => setCollectionPoint(text)}
             style={styles.input}

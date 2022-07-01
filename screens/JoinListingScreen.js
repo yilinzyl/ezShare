@@ -125,7 +125,7 @@ const JoinListingScreen = ({ route, navigation }) => {
         onPress: () => console.log("Cancel Pressed"),
         style: "cancel",
       },
-      { text: "Exit", onPress: () => navigation.navigate("Home") },
+      { text: "Exit", onPress: () => navigation.goBack() },
     ]);
 
   useEffect(() => {
@@ -195,7 +195,7 @@ const JoinListingScreen = ({ route, navigation }) => {
             />
           </View>
           <View style={styles.listingTitleAndErrorContainer}>
-            <Text style={styles.inputHeader}>Add Item URL</Text>
+            <Text style={styles.inputHeader}>Item URL</Text>
             {errorFields.includes("itemLink") && (
               <Text style={styles.warning}>{errorMessages["itemLink"]}</Text>
             )}
@@ -236,6 +236,7 @@ const JoinListingScreen = ({ route, navigation }) => {
             ]}
           >
             <TextInput
+              multiline
               placeholder="Enter details (eg. quantity, size, colour)"
               value={itemDescription}
               onChangeText={(text) => setItemDescription(text)}
@@ -289,6 +290,7 @@ const JoinListingScreen = ({ route, navigation }) => {
           <Text style={styles.inputHeader}>Other Requests</Text>
           <View style={styles.inputBoxBig}>
             <TextInput
+              multiline
               placeholder="Enter Other Requests"
               value={otherRequests}
               onChangeText={(text) => setItemRequests(text)}

@@ -423,15 +423,20 @@ const TrackScreen = ({ route, navigation }) => {
               >
                 <View key={joiner.key} style={styles.listing}>
                   <View style={styles.listingTextContainer}>
-                    <View style={styles.horizontalContainer}>
-                      <Text style={styles.listingTitle}>{joiner.itemName}</Text>
-                      <Text style={styles.listingCreator}>
-                        Joined by {joiner.username}
-                      </Text>
-                    </View>
-                    <Text style={styles.listingText}>
-                      {joiner.itemDescription}
+                    <Text style={styles.listingTitle}>{joiner.itemName}</Text>
+                    <Text style={styles.listingCreator}>
+                      Joined by {joiner.username}
                     </Text>
+                    {joiner.itemDescription.length <= 50 && (
+                      <Text style={styles.listingText}>
+                        {joiner.itemDescription}
+                      </Text>
+                    )}
+                    {joiner.itemDescription.length > 50 && (
+                      <Text style={styles.listingText}>
+                        {joiner.itemDescription.slice(0, 50)}...
+                      </Text>
+                    )}
 
                     <View style={styles.statusContainer}>
                       <View
@@ -609,7 +614,7 @@ const styles = StyleSheet.create({
   },
   listing: {
     backgroundColor: "#f9fafe",
-    height: height * 0.15,
+
     display: "flex",
     flexDirection: "row",
     borderColor: "#eeedff",
