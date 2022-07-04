@@ -91,27 +91,33 @@ const MyListingsScreen = () => {
             .filter((post) => post.listingName != null)
             .filter((post) => post.user == user.uid)
             .map((post) => (
-              <View key={post.listingName} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  {post.listingDescription.length <= 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription}
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("View Listing", { listingId: post.key })
+                }
+              >
+                <View key={post.listingName} style={styles.listing}>
+                  {/* temporary image for testing purposes */}
+                  <Image source={logo} style={styles.appLogo} />
+                  <View style={styles.listingTextContainer}>
+                    <Text style={styles.listingTitle}>{post.listingName}</Text>
+                    {post.listingDescription.length <= 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription}
+                      </Text>
+                    )}
+                    {post.listingDescription.length > 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription.slice(0, 30)}...
+                      </Text>
+                    )}
+                    <Text style={styles.listingText}>{post.category}</Text>
+                    <Text style={styles.listingCreator}>
+                      Created by {post.username}
                     </Text>
-                  )}
-                  {post.listingDescription.length > 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription.slice(0, 30)}...
-                    </Text>
-                  )}
-                  <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
         ) : (
           <Text style={styles.listingTitle}>
