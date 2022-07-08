@@ -378,7 +378,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
             )}
-            <Text style={styles.info}>approved</Text>
+            <Text style={styles.info}>Approved</Text>
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
@@ -396,7 +396,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
             )}
-            <Text style={styles.info}>paid</Text>
+            <Text style={styles.info}>Paid</Text>
           </View>
 
           <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
@@ -414,7 +414,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                 style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
               />
             )}
-            <Text style={styles.info}>collected</Text>
+            <Text style={styles.info}>Collected</Text>
           </View>
 
           <Text style={styles.infoHeader}>Item Name</Text>
@@ -424,7 +424,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
             style={styles.hyperlink}
             onPress={() => handleOpenURL(itemLink)}
           >
-            {itemLink}
+            Click to open link
           </Text>
           <Text style={styles.infoHeader}>Item Description</Text>
           <Text style={styles.info}>{itemDescription}</Text>
@@ -493,6 +493,9 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                     alignItems: "center",
                   }}
                 >
+                  <Text style={styles.provideText}>
+                    Provide Proof of Collection/ Mailing Proof to Joiner
+                  </Text>
                   <View
                     style={{
                       marginTop: height * 0.05,
@@ -533,10 +536,10 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                   )}
                   <TouchableOpacity
                     onPress={handleDeliveryProofButton}
-                    style={styles.updateButton}
+                    style={styles.submitButton}
                   >
                     <Text style={styles.buttonText}>
-                      Provide Proof of Collection/ Mailing Proof to Joiner
+                      Submit
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -675,11 +678,11 @@ const styles = StyleSheet.create({
     margin: 6,
   },
   hyperlink: {
-    fontFamily: "raleway-regular",
+    fontFamily: "raleway-bold",
     fontSize: 16,
     marginLeft: width * 0.05,
     marginBottom: 15,
-    color: "blue",
+    color: "#F898A3",
     textDecorationLine: "underline",
   },
   infoHeader: {
@@ -698,11 +701,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 15,
     marginBottom: height * 0.02,
+    borderRadius: 45,
+  },
+  submitButton: {
+    backgroundColor: "#F898A3",
+    height: 50,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    marginTop: 15,
+    marginBottom: height * 0.02,
+    borderRadius: 45,
   },
   buttonText: {
     fontFamily: "raleway-bold",
     color: "#F9FAFE",
     fontSize: 20,
+  },
+  provideText: {
+    fontFamily: "raleway-bold",
+    color: "#262626",
+    fontSize: 18,
   },
   widgetButton: {
     color: "white",

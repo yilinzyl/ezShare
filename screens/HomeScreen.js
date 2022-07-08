@@ -105,7 +105,7 @@ const HomeScreen = () => {
                 navigation.navigate("View Listing", { listingId: post.key })
               }
             >
-              <View key={post.listingName} style={styles.listing}>
+              <View key={post.user + post.listDate} style={styles.listing}>
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
@@ -143,7 +143,7 @@ const HomeScreen = () => {
                 navigation.navigate("View Listing", { listingId: post.key })
               }
             >
-              <View key={post.listingName} style={styles.listing}>
+              <View key={post.user + post.listDate} style={styles.listing}>
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>

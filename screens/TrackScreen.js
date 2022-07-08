@@ -455,7 +455,7 @@ const TrackScreen = ({ route, navigation }) => {
                           />
                         )}
 
-                        <Text style={styles.listingText}>approved</Text>
+                        <Text style={styles.listingText}>Approved</Text>
                       </View>
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
@@ -472,7 +472,7 @@ const TrackScreen = ({ route, navigation }) => {
                             size={0.035 * width}
                           />
                         )}
-                        <Text style={styles.listingText}>paid</Text>
+                        <Text style={styles.listingText}>Paid</Text>
                       </View>
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
@@ -489,7 +489,7 @@ const TrackScreen = ({ route, navigation }) => {
                             size={0.035 * width}
                           />
                         )}
-                        <Text style={styles.listingText}>collected</Text>
+                        <Text style={styles.listingText}>Collected</Text>
                       </View>
                     </View>
                     {!joiner.approved && (
@@ -513,7 +513,10 @@ const TrackScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.info}>no joiners yet</Text>
+            <View>
+              <Text style={styles.infoHeader}>No joiners yet.</Text>
+              <Text style={styles.info}>Details of those who joined your listing will be displayed here.</Text>
+            </View>
           )}
         </ScrollView>
       </View>
@@ -569,6 +572,11 @@ const styles = StyleSheet.create({
   info: {
     fontFamily: "raleway-regular",
     fontSize: 16,
+    marginLeft: width * 0.05,
+  },
+  infoHeader: {
+    fontFamily: "raleway-bold",
+    fontSize: 26,
     marginLeft: width * 0.05,
   },
   statusText: {
@@ -638,7 +646,7 @@ const styles = StyleSheet.create({
   actionText: {
     fontFamily: "raleway-regular",
     color: "#F88379",
-    fontSize: (20 * width) / height,
+    fontSize: (25 * width) / height,
   },
   listingCreator: {
     fontFamily: "raleway-bold",
