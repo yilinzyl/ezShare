@@ -14,6 +14,7 @@ import MyListingsScreen from "./screens/MyListingsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import JoinListingScreen from "./screens/JoinListingScreen";
 import ViewListingScreen from "./screens/ViewListingScreen";
+import ViewNewListingScreen from "./screens/ViewNewListingScreen";
 import PasswordScreen from "./screens/PasswordScreen";
 import UserSearchScreen from "./screens/UserSearchScreen";
 
@@ -99,6 +100,11 @@ export default function App() {
             options={{ headerShown: false }}
             name="View Listing"
             component={ViewListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="View New Listing"
+            component={ViewNewListingScreen}
           />
           <Stack.Screen
             options={{ headerShown: false }}

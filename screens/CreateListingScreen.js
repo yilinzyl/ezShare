@@ -208,7 +208,7 @@ const CreateListingScreen = () => {
     var ref = cloudStorage.ref("listingImages/" + id + ".jpg");
     return ref.put(blob).then(() => {
       blob.close();
-      navigation.navigate("View Listing", { listingId: id });
+      navigation.navigate("View New Listing", { listingId: id });
     });
   };
 

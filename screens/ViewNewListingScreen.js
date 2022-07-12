@@ -25,7 +25,7 @@ var width = Dimensions.get("window").width;
 // Variable height of current window
 var height = Dimensions.get("window").height;
 
-const ViewListingScreen = ({ route, navigation }) => {
+const ViewNewListingScreen = ({ route, navigation }) => {
   const user = auth.currentUser;
   //const navigation = useNavigation();
 
@@ -138,7 +138,7 @@ const ViewListingScreen = ({ route, navigation }) => {
             color="#B0C0F9"
             size={0.08 * width}
             style={{ marginLeft: width * -0.02 }}
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.popToTop()}
           />
           <View>
             <Text style={styles.header}>{listingName}</Text>
@@ -227,7 +227,7 @@ const ViewListingScreen = ({ route, navigation }) => {
   }
 };
 
-export default ViewListingScreen;
+export default ViewNewListingScreen;
 
 const styles = StyleSheet.create({
   background: {
