@@ -25,15 +25,6 @@ var height = Dimensions.get("window").height;
 const HomeScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("Log In");
-      })
-      .then(console.log("Signed out"))
-      .catch((error) => alert(error.message));
-  };
 
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);

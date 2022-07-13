@@ -30,6 +30,39 @@ const EditProfileScreen = () => {
   const navigation = useNavigation();
   const [name, setName] = useState(user.displayName);
   const [email, setEmail] = useState(user.email);
+  const [posts, setPosts] = useState([]);
+  const [listingIds, setlistingIds] = useState([]);
+
+  useEffect(() => {
+    const getPostsFromFirebase = [];
+    const subscriberListings = db
+      .collection("listing")
+      .onSnapshot((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          getPostsFromFirebase.push({
+            ...doc.data(),
+            key: doc.id,
+          });
+        });
+        setPosts(getPostsFromFirebase);
+      });
+    const getListingIdsFromFirebase = [];
+    const subscriberPosts = db
+      .collection("joined")
+      .onSnapshot((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          getListingIdsFromFirebase.push({
+            ...doc.data(),
+            key: doc.id,
+          });
+        });
+        setlistingIds(getListingIdsFromFirebase);
+      });
+    return () => {
+      subscriberListings();
+      subscriberPosts();
+    };
+  }, []);
 
   const exitCreatePopup = () =>
     Alert.alert("Confirm Exit?", "Changes you make will not be saved", [
@@ -49,7 +82,26 @@ const EditProfileScreen = () => {
           ? user.updateEmail(email)
           : console.log("email not changed")
       )
-      .then(db.collection("users").doc(user.uid).set({ name: name, userid: user.uid, email: user.email }))
+      .then(
+        db
+          .collection("users")
+          .doc(user.uid)
+          .set({ name: name, userid: user.uid, email: user.email })
+      )
+      .then(
+        posts
+          .filter((post) => post.user == user.uid)
+          .map((post) =>
+            db.collection("listing").doc(post.key).update({ username: name })
+          )
+      )
+      .then(
+        listingIds
+          .filter((post) => post.userID == user.uid)
+          .map((post) =>
+            db.collection("joined").doc(post.key).update({ username: name })
+          )
+      )
       .then(() => navigation.navigate("Profile"));
   return (
     <View style={styles.background}>

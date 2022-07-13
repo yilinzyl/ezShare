@@ -52,22 +52,21 @@ const UserSearchScreen = () => {
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
-      
-          <IconButton
-            icon="arrow-left"
-            color="#B0C0F9"
-            size={0.035 * height}
-            style={{ marginLeft: width * -0.7 }}
-            onPress={() => navigation.navigate("Explore")}
+        <IconButton
+          icon="arrow-left"
+          color="#B0C0F9"
+          size={0.035 * height}
+          style={{ marginLeft: width * -0.7 }}
+          onPress={() => navigation.navigate("Explore")}
+        />
+        <View style={styles.inputBox}>
+          <TextInput
+            placeholder="Enter User's Name or Email"
+            //value={keyword}
+            onChangeText={(text) => setKeyword(text)}
+            style={styles.input}
           />
-          <View style={styles.inputBox}>
-            <TextInput
-              placeholder="Enter User's Name or Email"
-              //value={keyword}
-              onChangeText={(text) => setKeyword(text)}
-              style={styles.input}
-            />
-          </View>
+        </View>
 
         <View style={styles.headerContainerHorizontal}>
           <Text style={styles.header}>Search by User</Text>
@@ -85,19 +84,22 @@ const UserSearchScreen = () => {
             .filter(
               (post) =>
                 keyword != "" &&
-                (post.name
-                  .toLowerCase()
-                  .includes(keyword.toLowerCase()) ||
+                (post.name.toLowerCase().includes(keyword.toLowerCase()) ||
                   post.email.toLowerCase().includes(keyword.toLowerCase()))
             )
             .map((post) => (
-              <View key={post.uid} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.name}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("User Info", { userId: post.key })
+                }
+              >
+                <View key={post.uid} style={styles.listing}>
+                  <View style={styles.listingTextContainer}>
+                    <Text style={styles.listingTitle}>{post.name}</Text>
+                    <Text style={styles.listingText}>{post.email}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
         ) : (
           <Text>no posts yet</Text>
@@ -189,7 +191,7 @@ const styles = StyleSheet.create({
   },
   listing: {
     backgroundColor: "#f9fafe",
-    height: height * 0.15,
+    height: height * 0.1,
     display: "flex",
     flexDirection: "row",
     borderColor: "#eeedff",
@@ -198,8 +200,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listingTextContainer: {
-    marginLeft: 0.05 * width,
-    width: 0.6 * width,
+    width: 0.7 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",
