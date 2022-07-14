@@ -25,15 +25,6 @@ var height = Dimensions.get("window").height;
 const HomeScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("Log In");
-      })
-      .then(console.log("Signed out"))
-      .catch((error) => alert(error.message));
-  };
 
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);
@@ -105,7 +96,7 @@ const HomeScreen = () => {
                 navigation.navigate("View Listing", { listingId: post.key })
               }
             >
-              <View key={post.listingName} style={styles.listing}>
+              <View key={post.user + post.listDate} style={styles.listing}>
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
@@ -143,7 +134,7 @@ const HomeScreen = () => {
                 navigation.navigate("View Listing", { listingId: post.key })
               }
             >
-              <View key={post.listingName} style={styles.listing}>
+              <View key={post.user + post.listDate} style={styles.listing}>
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
@@ -173,7 +164,7 @@ const HomeScreen = () => {
                 navigation.navigate("View Listing", { listingId: post.key })
               }
             >
-              <View key={post.listingName} style={styles.listing}>
+              <View key={post.listingDate + post.user} style={styles.listing}>
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>

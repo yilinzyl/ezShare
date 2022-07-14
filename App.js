@@ -14,9 +14,10 @@ import MyListingsScreen from "./screens/MyListingsScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import JoinListingScreen from "./screens/JoinListingScreen";
 import ViewListingScreen from "./screens/ViewListingScreen";
+import ViewNewListingScreen from "./screens/ViewNewListingScreen";
 import PasswordScreen from "./screens/PasswordScreen";
 import UserSearchScreen from "./screens/UserSearchScreen";
-
+import UserInfoScreen from "./screens/UserInfoScreen";
 import TrackScreen from "./screens/TrackScreen";
 
 import * as Font from "expo-font";
@@ -102,6 +103,11 @@ export default function App() {
           />
           <Stack.Screen
             options={{ headerShown: false }}
+            name="View New Listing"
+            component={ViewNewListingScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
             name="Join Listing"
             component={JoinListingScreen}
           />
@@ -114,6 +120,11 @@ export default function App() {
             options={{ headerShown: false }}
             name="Joiner Details"
             component={JoinerDetails}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="User Info"
+            component={UserInfoScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>
