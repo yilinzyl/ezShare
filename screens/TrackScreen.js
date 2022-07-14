@@ -136,7 +136,7 @@ const TrackScreen = ({ route, navigation }) => {
       subscriberListing();
       subscriberJoiner();
     };
-  }, ["listingId"]);
+  });
 
   if (loadingJoinerInfo || loadingListingInfo) {
     return (
@@ -513,7 +513,12 @@ const TrackScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.info}>no joiners yet</Text>
+            <View>
+              <Text style={styles.infoHeader}>No joiners yet.</Text>
+              <Text style={styles.info}>
+                Details of those who joined your listing will be displayed here.
+              </Text>
+            </View>
           )}
         </ScrollView>
       </View>
