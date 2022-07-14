@@ -62,7 +62,7 @@ const HomeScreen = () => {
       subscriberListings();
       subscriberPosts();
     };
-  }, []);
+  });
 
   if (loadingListings || loadingJoiners) {
     return (
