@@ -47,6 +47,10 @@ const UserInfoScreen = ({ route, navigation }) => {
         });
         setPosts(getPostsFromFirebase);
       });
+    return () => {
+      subscriber1();
+      subscriberListings();
+    };
   });
 
   return (
