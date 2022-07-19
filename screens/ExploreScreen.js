@@ -13,7 +13,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
 // import logo from "../assets/default-listing-icon.png";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
