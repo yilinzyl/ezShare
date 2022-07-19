@@ -12,7 +12,7 @@ import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 import { IconButton, Button } from "react-native-paper";
 
 // Variable width of current window
