@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
@@ -91,13 +92,10 @@ const JoinListingScreen = ({ route, navigation }) => {
   const handleJoinButton = () => {
     const nowErrorFields = [];
     const nowErrorMessages = {};
+
     if (itemName == "") {
       nowErrorFields.push("itemName");
       nowErrorMessages["itemName"] = "Required Field";
-    }
-    if (itemLink == "") {
-      nowErrorFields.push("itemLink");
-      nowErrorMessages["itemLink"] = "Required Field";
     }
     if (itemDescription == "") {
       nowErrorFields.push("itemDescription");
@@ -107,14 +105,35 @@ const JoinListingScreen = ({ route, navigation }) => {
       nowErrorFields.push("itemCost");
       nowErrorMessages["itemCost"] = "Required Field";
     }
-
-    setErrorFields(nowErrorFields);
-    setErrorMessages(nowErrorMessages);
-
-    if (nowErrorFields.length == 0) {
-      setPosting(true);
-      addToJoinedDatabase();
-      updateListingDatabase();
+    if (isNaN(itemCost)) {
+      nowErrorFields.push("itemCost");
+      nowErrorMessages["itemCost"] = "Please enter a number";
+    }
+    if (itemLink != "") {
+      Linking.canOpenURL(itemLink).then((supported) => {
+        if (supported) {
+          setErrorFields(nowErrorFields);
+          setErrorMessages(nowErrorMessages);
+          if (nowErrorFields.length == 0) {
+            setPosting(true);
+            addToJoinedDatabase();
+            updateListingDatabase();
+          }
+        } else {
+          nowErrorFields.push("itemLink");
+          nowErrorMessages["itemLink"] = "Please enter a valid link";
+          setErrorFields(nowErrorFields);
+          setErrorMessages(nowErrorMessages);
+        }
+      });
+    } else {
+      setErrorFields(nowErrorFields);
+      setErrorMessages(nowErrorMessages);
+      if (nowErrorFields.length == 0) {
+        setPosting(true);
+        addToJoinedDatabase();
+        updateListingDatabase();
+      }
     }
   };
 
