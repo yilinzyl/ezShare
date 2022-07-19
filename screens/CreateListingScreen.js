@@ -75,6 +75,10 @@ const CreateListingScreen = () => {
       nowErrorFields.push("cutOffDate");
       nowErrorMessages["cutOffDate"] = "Required Field";
     }
+    if (cutOffDate <= new Date()) {
+      nowErrorFields.push("cutOffDate");
+      nowErrorMessages["cutOffDate"] = "Cut off date must be in the future";
+    }
     if (targetAmount == "") {
       nowErrorFields.push("targetAmount");
       nowErrorMessages["targetAmount"] = "Required Field";
@@ -87,17 +91,17 @@ const CreateListingScreen = () => {
       nowErrorFields.push("deliveryFee");
       nowErrorMessages["deliveryFee"] = "Required Field";
     }
-    if (targetAmount < 0) {
+    if (isNaN(targetAmount)) {
       nowErrorFields.push("targetAmount");
-      nowErrorMessages["targetAmount"] = "Target amount cannot be negative";
+      nowErrorMessages["targetAmount"] = "Please enter a number";
     }
-    if (otherCosts < 0) {
+    if (isNaN(otherCosts)) {
       nowErrorFields.push("otherCosts");
-      nowErrorMessages["otherCosts"] = "Commission fee cannot be negative";
+      nowErrorMessages["otherCosts"] = "Please enter a number";
     }
-    if (deliveryFee < 0) {
+    if (isNaN(deliveryFee)) {
       nowErrorFields.push("deliveryFee");
-      nowErrorMessages["deliveryFee"] = "Delivery fee cannot be negative";
+      nowErrorMessages["deliveryFee"] = "Please enter a number";
     }
     if (collectionPoint == "") {
       nowErrorFields.push("collectionPoint");
