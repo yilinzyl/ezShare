@@ -95,15 +95,30 @@ const MyListingsScreen = () => {
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
                   {post.listingDescription.length <= 30 && (
                     <Text style={styles.listingText}>
-                      {post.listingDescription}
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
                   {post.listingDescription.length > 30 && (
                     <Text style={styles.listingText}>
-                      {post.listingDescription.slice(0, 30)}...
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
                     </Text>
                   )}
                   <Text style={styles.listingText}>{post.category}</Text>
