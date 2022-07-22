@@ -98,7 +98,8 @@ const ProfileScreen = () => {
             icon="magnify"
             color="#bababa"
             size={(80 * width) / height}
-            onPress={() => navigation.navigate("Explore")}/>
+            onPress={() => navigation.navigate("Explore")}
+          />
           <IconButton
             icon="account"
             color="#b0c0f9"
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderTopColor: "#eeedff",
     borderTopWidth: 3,
-    alignItems: "flex-start"
+    alignItems: "flex-start",
   },
   horizontalButtonText: {
     fontFamily: "raleway-bold",
@@ -161,8 +162,8 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-regular",
     color: "#262626",
     fontSize: (32 * width) / height,
-    marginRight: width * 0.6,
-    marginLeft: width * 0.05
+    marginRight: width * 0.06,
+    marginLeft: width * 0.05,
     //alignSelf: "flex-start"
   },
   buttonText: {
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   subheader: {
     fontFamily: "raleway-bold",
     fontSize: (36 * width) / height,
-    marginLeft: width * 0.1
+    marginLeft: width * 0.1,
   },
   name: {
     fontFamily: "raleway-bold",
