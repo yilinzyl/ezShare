@@ -38,6 +38,8 @@ const TrackScreen = ({ route, navigation }) => {
   const [readyForCollection, setReadyForCollection] = useState(false);
   const [readyForCollectionOld, setReadyForCollectionOld] = useState(false);
   const [joiners, setJoiners] = useState([]);
+  const [confirmed, setConfirmed] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
   const statuses = [
     "Accepting Orders - Target not reached",
@@ -51,14 +53,82 @@ const TrackScreen = ({ route, navigation }) => {
   ];
 
   const handleConfirmUpdate = () =>
-    Alert.alert("Confirm Update Status?", "This action is irreversible", [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel",
-      },
-      { text: "Confirm", onPress: handleUpdateStatus },
-    ]);
+    Alert.alert(
+      "Confirm Update Status?",
+      "You will not be allowed to go backwards.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: handleUpdateStatus },
+      ]
+    );
+
+  const handleConfirmConfirm = () =>
+    Alert.alert(
+      "Confirm Group Buy?",
+      "This is a promise to joiners that their items will be ordered and delivered.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: handleConfirm },
+      ]
+    );
+
+  const handleConfirmCancel = () =>
+    Alert.alert(
+      "Cancel Group Buy?",
+      "This action is irreversible. Group buy will be permanently closed.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: handleCancel },
+      ]
+    );
+
+  const handleConfirm = () => {
+    setConfirmed(true);
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        confirmed: true,
+      })
+      .then(() =>
+        Alert.alert("Group buy confirmed!", "", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ])
+      );
+  };
+
+  const handleCancel = () => {
+    setCancelled(true);
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        cancelled: true,
+        closed: true,
+        status: "Group buy cancelled",
+      })
+      .then(() =>
+        Alert.alert("Group buy cancelled.", "", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ])
+      );
+  };
 
   const handleUpdateStatus = () => {
     if (newStatus == oldStatus || newStatus == "") {
@@ -97,6 +167,8 @@ const TrackScreen = ({ route, navigation }) => {
         setListingName(listingData.listingName);
         setOldStatus(listingData.status);
         setReadyForCollectionOld(listingData.readyForCollection);
+        setConfirmed(listingData.confirmed);
+        setCancelled(listingData.cancelled);
         setLoadingListingInfo(false);
       });
     const getJoinersFromFirebase = [];
@@ -382,12 +454,46 @@ const TrackScreen = ({ route, navigation }) => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity
-            onPress={handleConfirmUpdate}
-            style={styles.updateButton}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
           >
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
+            {!confirmed && !cancelled && (
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={handleConfirmConfirm}
+                  style={styles.confirmButton}
+                >
+                  <Text style={styles.confirmButtonText}>
+                    Confirm Group Buy
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleConfirmCancel}
+                  style={styles.cancelButton}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel Group Buy</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {confirmed && (
+              <Text style={styles.confirmedText}>
+                {" "}
+                This group buy has been confirmed.{" "}
+              </Text>
+            )}
+            {cancelled && (
+              <Text style={styles.cancelledText}>
+                {" "}
+                This group buy has been cancelled.{" "}
+              </Text>
+            )}
+            <TouchableOpacity
+              onPress={handleConfirmUpdate}
+              style={styles.updateButton}
+            >
+              <Text style={styles.updatebuttonText}>Update status</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.buttonBottom}></View>
         </View>
         <ScrollView style={styles.listingContainer}>
@@ -578,19 +684,53 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     backgroundColor: "#F898A3",
-    height: 50,
-    width: 217,
-    borderRadius: 45,
+    height: height * 0.05,
+    width: width * 0.3,
     alignItems: "center",
     alignSelf: "center",
     justifyContent: "center",
+    margin: width * 0.015,
     marginTop: 10,
     marginBottom: height * 0.03,
   },
-  buttonText: {
+  confirmButton: {
+    borderWidth: 2,
+    borderColor: "#E97451",
+    height: height * 0.05,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    margin: width * 0.015,
+    marginTop: 10,
+    marginBottom: height * 0.03,
+  },
+  cancelButton: {
+    borderWidth: 2,
+    borderColor: "#696969",
+    height: height * 0.05,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    margin: width * 0.015,
+    marginTop: 10,
+    marginBottom: height * 0.03,
+  },
+  updatebuttonText: {
     fontFamily: "raleway-bold",
     color: "#F9FAFE",
-    fontSize: 20,
+    fontSize: 15,
+  },
+  confirmButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#E97451",
+    fontSize: 10,
+  },
+  cancelButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#696969",
+    fontSize: 10,
   },
   widgetButton: {
     color: "white",
@@ -646,5 +786,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: width * 0.9,
     justifyContent: "space-around",
+  },
+  confirmedText: {
+    fontFamily: "raleway-bold",
+    color: "black",
+    marginTop: 0.02 * height,
+    fontSize: (27 * width) / height,
+  },
+  cancelledText: {
+    fontFamily: "raleway-bold",
+    color: "red",
+    marginTop: 0.02 * height,
+    fontSize: (27 * width) / height,
   },
 });
