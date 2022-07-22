@@ -38,69 +38,124 @@ const TrackScreen = ({ route, navigation }) => {
   const [readyForCollection, setReadyForCollection] = useState(false);
   const [readyForCollectionOld, setReadyForCollectionOld] = useState(false);
   const [joiners, setJoiners] = useState([]);
+  const [confirmed, setConfirmed] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
-  const handleStopAcceptingOrders = () =>
-    Alert.alert("Confirm?", "Action cannot be reversed", [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel",
-      },
-      {
-        text: "Confirm",
-        onPress: () => {
-          db.collection("listing")
-            .doc(listingId)
-            .update({
-              acceptingOrders: false,
-            })
-            .then(() => {
-              console.log("Stopped Accepting Orders");
-            });
+  const statuses = [
+    "Accepting Orders - Target not reached",
+    "Accepting Orders - Target reached",
+    "Stopped Accepting Orders",
+    "Orders Placed",
+    "Orders out for Delivery",
+    "Ready for Collection",
+    "Group buy completed!",
+    "Group buy cancelled",
+  ];
+
+  const handleConfirmUpdate = () =>
+    Alert.alert(
+      "Confirm Update Status?",
+      "You will not be allowed to go backwards.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
         },
-      },
-    ]);
+        { text: "Confirm", onPress: handleUpdateStatus },
+      ]
+    );
 
-  const handleReadyToCollect = () =>
-    Alert.alert("Confirm?", "Action cannot be reversed", [
-      {
-        text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
-        style: "cancel",
-      },
-      {
-        text: "Confirm",
-        onPress: () => {
-          console.log("Updated Ready To Collect");
-          db.collection("listing")
-            .doc(listingId)
-            .update({
-              readyForCollection: true,
-            })
-            .then(() => {
-              console.log("Updated Ready To Collect");
-            });
+  const handleConfirmConfirm = () =>
+    Alert.alert(
+      "Confirm Group Buy?",
+      "This is a promise to joiners that their items will be ordered and delivered.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
         },
-      },
-    ]);
+        { text: "Confirm", onPress: handleConfirm },
+      ]
+    );
 
-  const handleUpdateStatus = () => {
+  const handleConfirmCancel = () =>
+    Alert.alert(
+      "Cancel Group Buy?",
+      "This action is irreversible. Group buy will be permanently closed.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: handleCancel },
+      ]
+    );
+
+  const handleConfirm = () => {
+    setConfirmed(true);
     db.collection("listing")
       .doc(listingId)
       .update({
-        status: newStatus,
-        acceptingOrders: acceptingOrders,
-        readyForCollection: readyForCollection,
-        closed: closed,
+        confirmed: true,
       })
       .then(() =>
-        Alert.alert("Status Updated!", "", [
+        Alert.alert("Group buy confirmed!", "", [
           {
             text: "Ok",
             style: "cancel",
           },
         ])
       );
+  };
+
+  const handleCancel = () => {
+    setCancelled(true);
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        cancelled: true,
+        closed: true,
+        status: "Group buy cancelled",
+      })
+      .then(() =>
+        Alert.alert("Group buy cancelled.", "", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ])
+      );
+  };
+
+  const handleUpdateStatus = () => {
+    if (newStatus == oldStatus || newStatus == "") {
+      Alert.alert("No change has been made", "Please select a new status", [
+        {
+          text: "Ok",
+          style: "cancel",
+        },
+      ]);
+    } else {
+      db.collection("listing")
+        .doc(listingId)
+        .update({
+          status: newStatus,
+          acceptingOrders: acceptingOrders,
+          readyForCollection: readyForCollection,
+          closed: closed,
+        })
+        .then(() =>
+          Alert.alert("Status Updated!", "", [
+            {
+              text: "Ok",
+              style: "cancel",
+            },
+          ])
+        );
+    }
   };
 
   useEffect(() => {
@@ -110,11 +165,10 @@ const TrackScreen = ({ route, navigation }) => {
       .onSnapshot((documentSnapshot) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
-        setAcceptingOrders(listingData.acceptingOrders);
         setOldStatus(listingData.status);
-        setClosed(listingData.closed);
         setReadyForCollectionOld(listingData.readyForCollection);
-        setReadyForCollection(listingData.readyForCollection);
+        setConfirmed(listingData.confirmed);
+        setCancelled(listingData.cancelled);
         setLoadingListingInfo(false);
       });
     const getJoinersFromFirebase = [];
@@ -136,7 +190,7 @@ const TrackScreen = ({ route, navigation }) => {
       subscriberListing();
       subscriberJoiner();
     };
-  }, ["listingId"]);
+  });
 
   if (loadingJoinerInfo || loadingListingInfo) {
     return (
@@ -167,68 +221,31 @@ const TrackScreen = ({ route, navigation }) => {
               <IconButton
                 icon="text-box-plus-outline"
                 color={
-                  oldStatus == "Accepting Orders - Target not reached"
-                    ? "black"
-                    : newStatus == "Accepting Orders - Target not reached"
-                    ? "#b0c0f9"
-                    : "#bababa"
-                }
-                size={0.09 * width}
-                onPress={() => {
-                  setNewStatus("Accepting Orders - Target not reached");
-                  setClosed(false);
-                  setAcceptingOrders(true);
-                  setReadyForCollection(false);
-                }}
-              />
-              <Text
-                style={[
-                  styles.statusText,
-                  {
-                    color:
-                      oldStatus == "Accepting Orders - Target not reached"
-                        ? "black"
-                        : newStatus == "Accepting Orders - Target not reached"
-                        ? "#b0c0f9"
-                        : "#bababa",
-                  },
-                ]}
-              >
-                Accepting Orders - Target not reached
-              </Text>
-            </View>
-            <View style={styles.eachStatus}>
-              <IconButton
-                icon="text-box-check-outline"
-                color={
+                  oldStatus == "Accepting Orders - Target not reached" ||
                   oldStatus == "Accepting Orders - Target reached"
-                    ? "black"
-                    : newStatus == "Accepting Orders - Target reached"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#9EACE0"
+                    : statuses.indexOf(oldStatus) > 1
+                    ? "#bababa"
+                    : "black"
                 }
                 size={0.09 * width}
-                onPress={() => {
-                  setNewStatus("Accepting Orders - Target reached");
-                  setClosed(false);
-                  setAcceptingOrders(true);
-                  setReadyForCollection(false);
-                }}
+                onPress={() => {}}
               />
               <Text
                 style={[
                   styles.statusText,
                   {
                     color:
+                      oldStatus == "Accepting Orders - Target not reached" ||
                       oldStatus == "Accepting Orders - Target reached"
-                        ? "black"
-                        : newStatus == "Accepting Orders - Target reached"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 1
+                        ? "#bababa"
+                        : "black",
                   },
                 ]}
               >
-                Accepting Orders - Target reached
+                Accepting Orders
               </Text>
             </View>
             <View style={styles.eachStatus}>
@@ -236,17 +253,22 @@ const TrackScreen = ({ route, navigation }) => {
                 icon="text-box-remove-outline"
                 color={
                   oldStatus == "Stopped Accepting Orders"
-                    ? "black"
+                    ? "#9EACE0"
+                    : statuses.indexOf(oldStatus) > 2
+                    ? "#bababa"
                     : newStatus == "Stopped Accepting Orders"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#f8a2ac"
+                    : "black"
                 }
                 size={0.09 * width}
                 onPress={() => {
-                  setNewStatus("Stopped Accepting Orders");
-                  setAcceptingOrders(false);
-                  setClosed(false);
-                  setReadyForCollection(false);
+                  if (statuses.indexOf(oldStatus) > 2) {
+                  } else {
+                    setNewStatus("Stopped Accepting Orders");
+                    setAcceptingOrders(false);
+                    setClosed(false);
+                    setReadyForCollection(false);
+                  }
                 }}
               />
               <Text
@@ -255,10 +277,12 @@ const TrackScreen = ({ route, navigation }) => {
                   {
                     color:
                       oldStatus == "Stopped Accepting Orders"
-                        ? "black"
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 2
+                        ? "#bababa"
                         : newStatus == "Stopped Accepting Orders"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#f8a2ac"
+                        : "black",
                   },
                 ]}
               >
@@ -270,17 +294,22 @@ const TrackScreen = ({ route, navigation }) => {
                 icon="cart"
                 color={
                   oldStatus == "Orders Placed"
-                    ? "black"
+                    ? "#7B86AE"
+                    : statuses.indexOf(oldStatus) > 3
+                    ? "#bababa"
                     : newStatus == "Orders Placed"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#f8a2ac"
+                    : "black"
                 }
                 size={0.09 * width}
                 onPress={() => {
-                  setNewStatus("Orders Placed");
-                  setAcceptingOrders(false);
-                  setClosed(false);
-                  setReadyForCollection(false);
+                  if (statuses.indexOf(oldStatus) > 3) {
+                  } else {
+                    setNewStatus("Orders Placed");
+                    setAcceptingOrders(false);
+                    setClosed(false);
+                    setReadyForCollection(false);
+                  }
                 }}
               />
               <Text
@@ -289,10 +318,12 @@ const TrackScreen = ({ route, navigation }) => {
                   {
                     color:
                       oldStatus == "Orders Placed"
-                        ? "black"
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 3
+                        ? "#bababa"
                         : newStatus == "Orders Placed"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#f8a2ac"
+                        : "black",
                   },
                 ]}
               >
@@ -304,17 +335,22 @@ const TrackScreen = ({ route, navigation }) => {
                 icon="airplane"
                 color={
                   oldStatus == "Orders out for Delivery"
-                    ? "black"
+                    ? "#9EACE0"
+                    : statuses.indexOf(oldStatus) > 4
+                    ? "#bababa"
                     : newStatus == "Orders out for Delivery"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#f8a2ac"
+                    : "black"
                 }
                 size={0.09 * width}
                 onPress={() => {
-                  setNewStatus("Orders out for Delivery");
-                  setAcceptingOrders(false);
-                  setClosed(false);
-                  setReadyForCollection(false);
+                  if (statuses.indexOf(oldStatus) > 4) {
+                  } else {
+                    setNewStatus("Orders out for Delivery");
+                    setAcceptingOrders(false);
+                    setClosed(false);
+                    setReadyForCollection(false);
+                  }
                 }}
               />
               <Text
@@ -323,10 +359,12 @@ const TrackScreen = ({ route, navigation }) => {
                   {
                     color:
                       oldStatus == "Orders out for Delivery"
-                        ? "black"
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 4
+                        ? "#bababa"
                         : newStatus == "Orders out for Delivery"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#f8a2ac"
+                        : "black",
                   },
                 ]}
               >
@@ -338,17 +376,22 @@ const TrackScreen = ({ route, navigation }) => {
                 icon="shopping"
                 color={
                   oldStatus == "Ready for Collection"
-                    ? "black"
+                    ? "#9EACE0"
+                    : statuses.indexOf(oldStatus) > 5
+                    ? "#bababa"
                     : newStatus == "Ready for Collection"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#f8a2ac"
+                    : "black"
                 }
                 size={0.09 * width}
                 onPress={() => {
-                  setNewStatus("Ready for Collection");
-                  setAcceptingOrders(false);
-                  setReadyForCollection(true);
-                  setClosed(false);
+                  if (statuses.indexOf(oldStatus) > 5) {
+                  } else {
+                    setNewStatus("Ready for Collection");
+                    setAcceptingOrders(false);
+                    setReadyForCollection(true);
+                    setClosed(false);
+                  }
                 }}
               />
               <Text
@@ -357,10 +400,12 @@ const TrackScreen = ({ route, navigation }) => {
                   {
                     color:
                       oldStatus == "Ready for Collection"
-                        ? "black"
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 5
+                        ? "#bababa"
                         : newStatus == "Ready for Collection"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#f8a2ac"
+                        : "black",
                   },
                 ]}
               >
@@ -372,17 +417,22 @@ const TrackScreen = ({ route, navigation }) => {
                 icon="check-circle-outline"
                 color={
                   oldStatus == "Group buy completed!"
-                    ? "black"
+                    ? "#9EACE0"
+                    : statuses.indexOf(oldStatus) > 6
+                    ? "#bababa"
                     : newStatus == "Group buy completed!"
-                    ? "#b0c0f9"
-                    : "#bababa"
+                    ? "#f8a2ac"
+                    : "black"
                 }
                 size={0.09 * width}
                 onPress={() => {
-                  setNewStatus("Group buy completed!");
-                  setAcceptingOrders(false);
-                  setReadyForCollection(true);
-                  setClosed(true);
+                  if (statuses.indexOf(oldStatus) > 6) {
+                  } else {
+                    setNewStatus("Group buy completed!");
+                    setAcceptingOrders(false);
+                    setReadyForCollection(true);
+                    setClosed(true);
+                  }
                 }}
               />
               <Text
@@ -391,10 +441,12 @@ const TrackScreen = ({ route, navigation }) => {
                   {
                     color:
                       oldStatus == "Group buy completed!"
-                        ? "black"
+                        ? "#9EACE0"
+                        : statuses.indexOf(oldStatus) > 6
+                        ? "#bababa"
                         : newStatus == "Group buy completed!"
-                        ? "#b0c0f9"
-                        : "#bababa",
+                        ? "#f8a2ac"
+                        : "black",
                   },
                 ]}
               >
@@ -402,12 +454,46 @@ const TrackScreen = ({ route, navigation }) => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity
-            onPress={handleUpdateStatus}
-            style={styles.updateButton}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-evenly" }}
           >
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
+            {!confirmed && !cancelled && (
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                  onPress={handleConfirmConfirm}
+                  style={styles.confirmButton}
+                >
+                  <Text style={styles.confirmButtonText}>
+                    Confirm Group Buy
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleConfirmCancel}
+                  style={styles.cancelButton}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel Group Buy</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {confirmed && (
+              <Text style={styles.confirmedText}>
+                {" "}
+                This group buy has been confirmed.{" "}
+              </Text>
+            )}
+            {cancelled && (
+              <Text style={styles.cancelledText}>
+                {" "}
+                This group buy has been cancelled.{" "}
+              </Text>
+            )}
+            <TouchableOpacity
+              onPress={handleConfirmUpdate}
+              style={styles.updateButton}
+            >
+              <Text style={styles.updatebuttonText}>Update status</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.buttonBottom}></View>
         </View>
         <ScrollView style={styles.listingContainer}>
@@ -503,11 +589,13 @@ const TrackScreen = ({ route, navigation }) => {
                         now.
                       </Text>
                     )}
-                    {readyForCollectionOld && !joiner.collected && (
-                      <Text style={styles.actionText}>
-                        Action Required: Provide collection/mailing proof
-                      </Text>
-                    )}
+                    {readyForCollectionOld &&
+                      joiner.deliveryProof == "" &&
+                      !joiner.collected && (
+                        <Text style={styles.actionText}>
+                          Action Required: Provide collection/mailing proof
+                        </Text>
+                      )}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -515,7 +603,9 @@ const TrackScreen = ({ route, navigation }) => {
           ) : (
             <View>
               <Text style={styles.infoHeader}>No joiners yet.</Text>
-              <Text style={styles.info}>Details of those who joined your listing will be displayed here.</Text>
+              <Text style={styles.info}>
+                Details of those who joined your listing will be displayed here.
+              </Text>
             </View>
           )}
         </ScrollView>
@@ -594,19 +684,53 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     backgroundColor: "#F898A3",
-    height: 50,
-    width: 217,
-    borderRadius: 45,
+    height: height * 0.05,
+    width: width * 0.3,
     alignItems: "center",
     alignSelf: "center",
     justifyContent: "center",
+    margin: width * 0.015,
     marginTop: 10,
     marginBottom: height * 0.03,
   },
-  buttonText: {
+  confirmButton: {
+    borderWidth: 2,
+    borderColor: "#E97451",
+    height: height * 0.05,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    margin: width * 0.015,
+    marginTop: 10,
+    marginBottom: height * 0.03,
+  },
+  cancelButton: {
+    borderWidth: 2,
+    borderColor: "#696969",
+    height: height * 0.05,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    margin: width * 0.015,
+    marginTop: 10,
+    marginBottom: height * 0.03,
+  },
+  updatebuttonText: {
     fontFamily: "raleway-bold",
     color: "#F9FAFE",
-    fontSize: 20,
+    fontSize: 15,
+  },
+  confirmButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#E97451",
+    fontSize: 10,
+  },
+  cancelButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#696969",
+    fontSize: 10,
   },
   widgetButton: {
     color: "white",
@@ -662,5 +786,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: width * 0.9,
     justifyContent: "space-around",
+  },
+  confirmedText: {
+    fontFamily: "raleway-bold",
+    color: "black",
+    marginTop: 0.02 * height,
+    fontSize: (27 * width) / height,
+  },
+  cancelledText: {
+    fontFamily: "raleway-bold",
+    color: "red",
+    marginTop: 0.02 * height,
+    fontSize: (27 * width) / height,
   },
 });

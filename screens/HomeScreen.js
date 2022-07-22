@@ -14,7 +14,7 @@ import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -25,15 +25,6 @@ var height = Dimensions.get("window").height;
 const HomeScreen = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("Log In");
-      })
-      .then(console.log("Signed out"))
-      .catch((error) => alert(error.message));
-  };
 
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);
@@ -109,15 +100,30 @@ const HomeScreen = () => {
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
                   {post.listingDescription.length <= 30 && (
                     <Text style={styles.listingText}>
-                      {post.listingDescription}
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
                   {post.listingDescription.length > 30 && (
                     <Text style={styles.listingText}>
-                      {post.listingDescription.slice(0, 30)}...
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
                     </Text>
                   )}
                   <Text style={styles.listingText}>{post.category}</Text>
@@ -147,10 +153,32 @@ const HomeScreen = () => {
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
                   <Text style={styles.listingText}>{post.category}</Text>
                   <Text style={styles.listingCreator}>
                     Created by {post.username}
@@ -177,10 +205,32 @@ const HomeScreen = () => {
                 {/* temporary image for testing purposes */}
                 <Image source={logo} style={styles.appLogo} />
                 <View style={styles.listingTextContainer}>
-                  <Text style={styles.listingTitle}>{post.listingName}</Text>
-                  <Text style={styles.listingText}>
-                    {post.listingDescription}
-                  </Text>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
                   <Text style={styles.listingText}>{post.category}</Text>
                   <Text style={styles.listingCreator}>
                     Created by {post.username}

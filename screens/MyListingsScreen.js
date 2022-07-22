@@ -12,7 +12,7 @@ import React, { useState, useEffect } from "react";
 import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 import { IconButton, Button } from "react-native-paper";
 
 // Variable width of current window
@@ -100,17 +100,32 @@ const MyListingsScreen = () => {
                   {/* temporary image for testing purposes */}
                   <Image source={logo} style={styles.appLogo} />
                   <View style={styles.listingTextContainer}>
-                    <Text style={styles.listingTitle}>{post.listingName}</Text>
-                    {post.listingDescription.length <= 30 && (
-                      <Text style={styles.listingText}>
-                        {post.listingDescription}
-                      </Text>
-                    )}
-                    {post.listingDescription.length > 30 && (
-                      <Text style={styles.listingText}>
-                        {post.listingDescription.slice(0, 30)}...
-                      </Text>
-                    )}
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
                     <Text style={styles.listingText}>{post.category}</Text>
                     <Text style={styles.listingCreator}>
                       Created by {post.username}

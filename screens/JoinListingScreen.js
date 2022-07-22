@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Linking,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
@@ -17,6 +18,7 @@ import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
 import Loader from "react-native-modal-loader";
+import DropDownPicker from "react-native-dropdown-picker";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -40,9 +42,20 @@ const JoinListingScreen = ({ route, navigation }) => {
   const [currentAmount, setCurrentAmount] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
   const [status, setStatus] = useState("");
+  const [contact, setContact] = useState("");
+  const [address, setAddress] = useState("");
+  const [collectionMethods, setCollectionMethods] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState("");
+  const [collectionPoint, setCollectionPoint] = useState("");
   const [errorFields, setErrorFields] = useState([]);
   const [errorMessages, setErrorMessages] = useState({});
   const [posting, setPosting] = useState(false);
+
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const collectionOptions = [
+    { label: "Mailing", value: "Mailing" },
+    { label: "Meet up", value: "MeetUp" },
+  ];
 
   const addToJoinedDatabase = () => {
     db.collection("joined")
@@ -56,6 +69,10 @@ const JoinListingScreen = ({ route, navigation }) => {
         itemLink: itemLink,
         itemDescription: itemDescription,
         itemCost: itemCost,
+        totalCost:
+          parseFloat(itemCost) +
+          parseFloat(deliveryFee) +
+          parseFloat(otherCosts),
         otherRequests: otherRequests,
         collected: false,
         paid: false,
@@ -64,7 +81,9 @@ const JoinListingScreen = ({ route, navigation }) => {
         deliveryProof: "",
         completed: false,
         declined: false,
-        issues: "",
+        contact: contact,
+        address: address,
+        collectionMethod: selectedCollection,
       })
       .then(() => {
         console.log("Joined Data Added!");
@@ -91,13 +110,10 @@ const JoinListingScreen = ({ route, navigation }) => {
   const handleJoinButton = () => {
     const nowErrorFields = [];
     const nowErrorMessages = {};
+
     if (itemName == "") {
       nowErrorFields.push("itemName");
       nowErrorMessages["itemName"] = "Required Field";
-    }
-    if (itemLink == "") {
-      nowErrorFields.push("itemLink");
-      nowErrorMessages["itemLink"] = "Required Field";
     }
     if (itemDescription == "") {
       nowErrorFields.push("itemDescription");
@@ -107,14 +123,47 @@ const JoinListingScreen = ({ route, navigation }) => {
       nowErrorFields.push("itemCost");
       nowErrorMessages["itemCost"] = "Required Field";
     }
-
-    setErrorFields(nowErrorFields);
-    setErrorMessages(nowErrorMessages);
-
-    if (nowErrorFields.length == 0) {
-      setPosting(true);
-      addToJoinedDatabase();
-      updateListingDatabase();
+    if (isNaN(itemCost)) {
+      nowErrorFields.push("itemCost");
+      nowErrorMessages["itemCost"] = "Please enter a number";
+    }
+    if (contact == "") {
+      nowErrorFields.push("contact");
+      nowErrorMessages["contact"] = "Required Field";
+    }
+    if (selectedCollection == "") {
+      nowErrorFields.push("selectedCollection");
+      nowErrorMessages["selectedCollection"] = "Required Field";
+    }
+    if (selectedCollection == "Mailing" && address == "") {
+      nowErrorFields.push("address");
+      nowErrorMessages["address"] = "Required for mailing option";
+    }
+    if (itemLink != "") {
+      Linking.canOpenURL(itemLink).then((supported) => {
+        if (supported) {
+          setErrorFields(nowErrorFields);
+          setErrorMessages(nowErrorMessages);
+          if (nowErrorFields.length == 0) {
+            setPosting(true);
+            addToJoinedDatabase();
+            updateListingDatabase();
+          }
+        } else {
+          nowErrorFields.push("itemLink");
+          nowErrorMessages["itemLink"] = "Please enter a valid link";
+          setErrorFields(nowErrorFields);
+          setErrorMessages(nowErrorMessages);
+        }
+      });
+    } else {
+      setErrorFields(nowErrorFields);
+      setErrorMessages(nowErrorMessages);
+      if (nowErrorFields.length == 0) {
+        setPosting(true);
+        addToJoinedDatabase();
+        updateListingDatabase();
+      }
     }
   };
 
@@ -138,8 +187,16 @@ const JoinListingScreen = ({ route, navigation }) => {
         setTargetAmount(listingData.targetAmount);
         setOtherCosts(Number(listingData.otherCosts));
         setDeliveryFee(Number(listingData.deliveryFee));
-        console.log(typeof deliveryFee);
         setCurrentAmount(listingData.currentAmount);
+        if (listingData.collectionPoint == "") {
+          setSelectedCollection("Mailing");
+          setCollectionMethods("Mailing");
+        }
+        if (listingData.mailingMethod == "") {
+          setSelectedCollection("MeetUp");
+          setCollectionMethods("MeetUp");
+        }
+        setCollectionPoint(listingData.collectionPoint);
         setStatus(listingData.status);
         setLoading(false);
       });
@@ -287,6 +344,74 @@ const JoinListingScreen = ({ route, navigation }) => {
               Total Cost: S${parseFloat(deliveryFee) + parseFloat(otherCosts)}
             </Text>
           )}
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Collection Method</Text>
+            {errorFields.includes("selectedCollection") && (
+              <Text style={styles.warning}>
+                {errorMessages["selectedCollection"]}
+              </Text>
+            )}
+          </View>
+          {collectionMethods == "" && (
+            <DropDownPicker
+              style={[
+                styles.dropdown,
+                {
+                  borderColor: errorFields.includes("selectedCollection")
+                    ? "red"
+                    : "#B0C0F9",
+                  zIndex: 1000,
+                },
+              ]}
+              dropDownContainerStyle={styles.dropdownContainer}
+              labelStyle={styles.input}
+              listItemLabelStyle={styles.input}
+              open={collectionOpen}
+              value={selectedCollection}
+              items={collectionOptions}
+              setOpen={setCollectionOpen}
+              setValue={setSelectedCollection}
+              placeholder="Select Collection Method"
+              listMode="SCROLLVIEW"
+              placeholderStyle={[styles.input, { color: "#A9A9A9" }]}
+            />
+          )}
+          {selectedCollection == "Mailing" && (
+            <View>
+              {errorFields.includes("address") && (
+                <Text style={[styles.warning, { marginLeft: width * 0.05 }]}>
+                  {errorMessages["address"]}
+                </Text>
+              )}
+              <View style={styles.listingTitleAndErrorContainer}>
+                <View
+                  style={[
+                    styles.inputBox,
+                    {
+                      borderColor: errorFields.includes("address")
+                        ? "red"
+                        : "#B0C0F9",
+                    },
+                  ]}
+                >
+                  <TextInput
+                    placeholder="Enter Mailing Address"
+                    value={address}
+                    onChangeText={(text) => setAddress(text)}
+                    style={styles.input}
+                  />
+                </View>
+              </View>
+            </View>
+          )}
+          {selectedCollection == "MeetUp" && (
+            <View>
+              <Text style={styles.info}>
+                Please arrange meet up with creator at:
+              </Text>
+              <Text style={styles.info}>{collectionPoint}</Text>
+            </View>
+          )}
           <Text style={styles.inputHeader}>Other Requests</Text>
           <View style={styles.inputBoxBig}>
             <TextInput
@@ -294,6 +419,29 @@ const JoinListingScreen = ({ route, navigation }) => {
               placeholder="Enter Other Requests"
               value={otherRequests}
               onChangeText={(text) => setItemRequests(text)}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.listingTitleAndErrorContainer}>
+            <Text style={styles.inputHeader}>Contact Details</Text>
+            {errorFields.includes("contact") && (
+              <Text style={styles.warning}>{errorMessages["contact"]}</Text>
+            )}
+          </View>
+          <View
+            style={[
+              styles.inputBox,
+              {
+                borderColor: errorFields.includes("contact")
+                  ? "red"
+                  : "#B0C0F9",
+              },
+            ]}
+          >
+            <TextInput
+              placeholder="(eg. phone number/telegram handle)"
+              value={contact}
+              onChangeText={(text) => setContact(text)}
               style={styles.input}
             />
           </View>
@@ -420,5 +568,37 @@ const styles = StyleSheet.create({
   },
   buttonBottom: {
     height: 0.05 * height,
+  },
+  dropdown: {
+    borderColor: "#d7dffc",
+    borderWidth: 0.75,
+    width: width * 0.9,
+    height: height * 0.06,
+    marginBottom: 13,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
+    marginTop: 5,
+    height: height * 0.06,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 12,
+    shadowColor: "#58607c",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 5,
+
+    elevation: 2,
+  },
+  dropdownContainer: {
+    borderColor: "white",
+    borderWidth: 2,
+    borderRadius: 10,
+    width: width * 0.9,
+    marginBottom: 13,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
   },
 });

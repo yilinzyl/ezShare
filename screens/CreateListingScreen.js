@@ -33,6 +33,7 @@ const CreateListingScreen = () => {
   const [cutOffDate, setCutOffDate] = useState("Select");
   const [targetAmount, setTargetAmount] = useState("");
   const [otherCosts, setOtherCosts] = useState("");
+  const [collectionMethods, setCollectionMethods] = useState([]);
   const [collectionPoint, setCollectionPoint] = useState("");
   const [deliveryFee, setDeliveryFee] = useState("");
   const [errorFields, setErrorFields] = useState([]);
@@ -41,8 +42,10 @@ const CreateListingScreen = () => {
   const [posting, setPosting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentDetails, setPaymentDetails] = useState("");
-  const [catOpen, setCatOpen] = useState(false);
 
+  const [contact, setContact] = useState("");
+
+  const [catOpen, setCatOpen] = useState(false);
   const categoryOptions = [
     { label: "Food", value: "Food" },
     { label: "Fashion", value: "Fashion" },
@@ -56,6 +59,11 @@ const CreateListingScreen = () => {
   const paymentOptions = [
     { label: "Cash on Collection", value: "cash" },
     { label: "Paylah/Paynow", value: "banking" },
+  ];
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const collectionOptions = [
+    { label: "Mailing", value: "Mailing" },
+    { label: "Meet up", value: "MeetUp" },
   ];
 
   const navigation = useNavigation();
@@ -75,6 +83,10 @@ const CreateListingScreen = () => {
       nowErrorFields.push("cutOffDate");
       nowErrorMessages["cutOffDate"] = "Required Field";
     }
+    if (cutOffDate <= new Date()) {
+      nowErrorFields.push("cutOffDate");
+      nowErrorMessages["cutOffDate"] = "Cut off date must be in the future";
+    }
     if (targetAmount == "") {
       nowErrorFields.push("targetAmount");
       nowErrorMessages["targetAmount"] = "Required Field";
@@ -87,21 +99,25 @@ const CreateListingScreen = () => {
       nowErrorFields.push("deliveryFee");
       nowErrorMessages["deliveryFee"] = "Required Field";
     }
-    if (targetAmount < 0) {
+    if (isNaN(targetAmount)) {
       nowErrorFields.push("targetAmount");
-      nowErrorMessages["targetAmount"] = "Target amount cannot be negative";
+      nowErrorMessages["targetAmount"] = "Please enter a number";
     }
-    if (otherCosts < 0) {
+    if (isNaN(otherCosts)) {
       nowErrorFields.push("otherCosts");
-      nowErrorMessages["otherCosts"] = "Commission fee cannot be negative";
+      nowErrorMessages["otherCosts"] = "Please enter a number";
     }
-    if (deliveryFee < 0) {
+    if (isNaN(deliveryFee)) {
       nowErrorFields.push("deliveryFee");
-      nowErrorMessages["deliveryFee"] = "Delivery fee cannot be negative";
+      nowErrorMessages["deliveryFee"] = "Please enter a number";
     }
-    if (collectionPoint == "") {
+    if (collectionMethods.length == 0) {
+      nowErrorFields.push("collectionMethods");
+      nowErrorMessages["collectionMethods"] = "Please select at least 1 option";
+    }
+    if (collectionMethods.includes("MeetUp") && collectionPoint == "") {
       nowErrorFields.push("collectionPoint");
-      nowErrorMessages["collectionPoint"] = "Required Field";
+      nowErrorMessages["collectionPoint"] = "Required for meet-ups";
     }
     if (paymentMethod == "") {
       nowErrorFields.push("paymentMethod");
@@ -110,6 +126,10 @@ const CreateListingScreen = () => {
     if (paymentMethod == "banking" && paymentDetails == "") {
       nowErrorFields.push("paymentDetails");
       nowErrorMessages["paymentDetails"] = "Required for this payment method";
+    }
+    if (contact == "") {
+      nowErrorFields.push("contact");
+      nowErrorMessages["contact"] = "Required Field";
     }
 
     setErrorFields(nowErrorFields);
@@ -120,6 +140,7 @@ const CreateListingScreen = () => {
       db.collection("listing")
         .add({
           category: category,
+          mailingMethod: collectionMethods.includes("Mailing") ? "Mailing" : "",
           collectionPoint: collectionPoint,
           cutOffDate: cutOffDate,
           listDate: new Date(),
@@ -131,18 +152,21 @@ const CreateListingScreen = () => {
           user: user.uid,
           username: user.displayName,
           currentAmount: 0,
-          acceptingOrders: true,
           status: "Accepting Orders - Target not reached",
-          readyForCollection: false,
-          closed: false,
           imagePresent: image != null,
           paymentMethod: paymentMethod,
           paymentDetails: paymentDetails,
-          issues: "",
+          contact: contact,
+          confirmed: false,
+          cancelled: false,
+          readyForCollection: false,
+          closed: false,
+          acceptingOrders: true,
         })
         .then((docRef) => {
           if (image != null) {
             uploadImage(image, docRef.id);
+            navigation.navigate("View New Listing", { listingId: docRef.id });
           } else {
             navigation.navigate("View Listing", { listingId: docRef.id });
           }
@@ -208,7 +232,6 @@ const CreateListingScreen = () => {
     var ref = cloudStorage.ref("listingImages/" + id + ".jpg");
     return ref.put(blob).then(() => {
       blob.close();
-      navigation.navigate("View New Listing", { listingId: id });
     });
   };
 
@@ -436,30 +459,63 @@ const CreateListingScreen = () => {
         </View>
         <View style={styles.listingTitleAndErrorContainer}>
           <Text style={styles.inputHeader}>Collection Details</Text>
-          {errorFields.includes("collectionPoint") && (
+          {errorFields.includes("collectionMethods") && (
             <Text style={styles.warning}>
-              {errorMessages["collectionPoint"]}
+              {errorMessages["collectionMethods"]}
             </Text>
           )}
         </View>
-        <View
+        <DropDownPicker
           style={[
-            styles.inputBoxBig,
+            styles.dropdown,
             {
-              borderColor: errorFields.includes("collectionPoint")
+              borderColor: errorFields.includes("collectionMethods")
                 ? "red"
                 : "#B0C0F9",
             },
           ]}
-        >
-          <TextInput
-            multiline
-            placeholder="Enter Collection Details (eg. normal mail/self collect at collection point, contact)"
-            value={collectionPoint}
-            onChangeText={(text) => setCollectionPoint(text)}
-            style={styles.input}
-          />
-        </View>
+          dropDownContainerStyle={styles.dropdownContainer}
+          labelStyle={styles.input}
+          listItemLabelStyle={styles.input}
+          multiple={true}
+          open={collectionOpen}
+          value={collectionMethods}
+          items={collectionOptions}
+          setOpen={setCollectionOpen}
+          setValue={setCollectionMethods}
+          placeholder="Select Collection Method"
+          listMode="SCROLLVIEW"
+          placeholderStyle={[styles.input, { color: "#A9A9A9" }]}
+          mode="BADGE"
+        />
+        {collectionMethods.includes("MeetUp") && (
+          <View>
+            {errorFields.includes("collectionPoint") && (
+              <Text style={[styles.warning, { marginLeft: width * 0.05 }]}>
+                {errorMessages["collectionPoint"]}
+              </Text>
+            )}
+            <View style={styles.listingTitleAndErrorContainer}>
+              <View
+                style={[
+                  styles.inputBox,
+                  {
+                    borderColor: errorFields.includes("collectionPoint")
+                      ? "red"
+                      : "#B0C0F9",
+                  },
+                ]}
+              >
+                <TextInput
+                  placeholder="Enter Collection Point"
+                  value={collectionPoint}
+                  onChangeText={(text) => setCollectionPoint(text)}
+                  style={styles.input}
+                />
+              </View>
+            </View>
+          </View>
+        )}
         <View style={styles.listingTitleAndErrorContainer}>
           <Text style={styles.inputHeader}>Payment Details</Text>
           {errorFields.includes("paymentMethod") && (
@@ -473,6 +529,7 @@ const CreateListingScreen = () => {
               borderColor: errorFields.includes("paymentMethod")
                 ? "red"
                 : "#B0C0F9",
+              zIndex: 1000,
             },
           ]}
           dropDownContainerStyle={styles.dropdownContainer}
@@ -526,7 +583,38 @@ const CreateListingScreen = () => {
             </Text>
           </View>
         )}
-
+        <View style={styles.listingTitleAndErrorContainer}>
+          <Text style={styles.inputHeader}>Contact Details</Text>
+          {errorFields.includes("contact") && (
+            <Text style={styles.warning}>{errorMessages["contact"]}</Text>
+          )}
+        </View>
+        <View
+          style={[
+            styles.inputBox,
+            {
+              borderColor: errorFields.includes("contact") ? "red" : "#B0C0F9",
+            },
+          ]}
+        >
+          <TextInput
+            placeholder="(eg. phone number/telegram handle)"
+            value={contact}
+            onChangeText={(text) => setContact(text)}
+            style={styles.input}
+          />
+        </View>
+        <Text
+          style={{
+            fontFamily: "raleway-regular",
+            fontSize: 10,
+            textAlign: "right",
+            marginRight: width * 0.05,
+            marginTop: -6,
+          }}
+        >
+          (shown only when joiner has been approved)
+        </Text>
         <TouchableOpacity
           onPress={handleCreateListing}
           style={styles.createButton}
