@@ -100,32 +100,32 @@ const MyListingsScreen = () => {
                   {/* temporary image for testing purposes */}
                   <Image source={logo} style={styles.appLogo} />
                   <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 25 && (
-                    <Text style={styles.listingTitle}>
-                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
-                    </Text>
-                  )}
-                  {post.listingName.length > 25 && (
-                    <Text style={styles.listingTitle}>
-                      {post.listingName
-                        .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 30)}
-                      ...
-                    </Text>
-                  )}
-                  {post.listingDescription.length <= 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
-                    </Text>
-                  )}
-                  {post.listingDescription.length > 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription
-                        .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 30)}
-                      ...
-                    </Text>
-                  )}
+                    {post.listingName.length <= 25 && (
+                      <Text style={styles.listingTitle}>
+                        {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                      </Text>
+                    )}
+                    {post.listingName.length > 25 && (
+                      <Text style={styles.listingTitle}>
+                        {post.listingName
+                          .replace(/(\r\n|\n|\r)/gm, " ")
+                          .slice(0, 30)}
+                        ...
+                      </Text>
+                    )}
+                    {post.listingDescription.length <= 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                      </Text>
+                    )}
+                    {post.listingDescription.length > 30 && (
+                      <Text style={styles.listingText}>
+                        {post.listingDescription
+                          .replace(/(\r\n|\n|\r)/gm, " ")
+                          .slice(0, 30)}
+                        ...
+                      </Text>
+                    )}
                     <Text style={styles.listingText}>{post.category}</Text>
                     <Text style={styles.listingCreator}>
                       Created by {post.username}
@@ -135,7 +135,7 @@ const MyListingsScreen = () => {
               </TouchableOpacity>
             ))
         ) : (
-          <Text style={styles.listingTitle}>
+          <Text style={styles.subheader}>
             You have not created any listings.
           </Text>
         )}
