@@ -14,7 +14,7 @@ import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -133,6 +133,70 @@ const KeywordSearchScreen = () => {
                     <Text style={styles.listingCreator}>
                       Created by {post.username}
                     </Text>
+                    <View style={styles.statusContainer}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        {post.confirmed && (
+                          <IconButton
+                            icon="checkbox-outline"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: 0,
+                            }}
+                          />
+                        )}
+                        {!post.confirmed && (
+                          <IconButton
+                            icon="checkbox-blank-outline"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: 0,
+                            }}
+                          />
+                        )}
+                      </View>
+                      {post.mailingMethod != "" && (
+                        <IconButton
+                          icon="truck"
+                          size={0.035 * width}
+                          style={{
+                            marginLeft: 0,
+                            marginRight: 0,
+                          }}
+                        />
+                      )}
+                      {post.collectionPoint != "" && (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <IconButton
+                            icon="map-marker"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.01 * width,
+                            }}
+                          />
+                          {post.collectionPoint.length > 35 && (
+                            <Text style={styles.statusText}>
+                              {post.collectionPoint.slice(0, 35)} ...
+                            </Text>
+                          )}
+                          {post.collectionPoint.length <= 35 && (
+                            <Text style={styles.statusText}>
+                              {post.collectionPoint}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -214,6 +278,16 @@ const styles = StyleSheet.create({
   listingContainer: {
     height: height * 0.62,
     backgroundColor: "#f9fafe",
+  },
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginTop: -0.02 * width,
+  },
+  statusText: {
+    fontFamily: "raleway-regular",
+    color: "#707070",
+    fontSize: (20 * width) / height,
   },
   footer: {
     backgroundColor: "#f2f2f2",
