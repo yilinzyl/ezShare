@@ -139,12 +139,16 @@ const TrackScreen = ({ route, navigation }) => {
         status: "Group buy cancelled",
       })
       .then(() =>
-        Alert.alert("Group buy cancelled.", "", [
-          {
-            text: "Ok",
-            style: "cancel",
-          },
-        ])
+        Alert.alert(
+          "Group buy cancelled.",
+          "Please contact joiners to refund any payment made.",
+          [
+            {
+              text: "Ok",
+              style: "cancel",
+            },
+          ]
+        )
       );
   };
 
@@ -532,62 +536,66 @@ const TrackScreen = ({ route, navigation }) => {
                         {joiner.itemDescription.slice(0, 50)}...
                       </Text>
                     )}
+                    {joiner.declinedReason != "" && (
+                      <Text style={styles.rejectText}>Rejected</Text>
+                    )}
+                    {joiner.declinedReason == "" && (
+                      <View style={styles.statusContainer}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          {joiner.approved && (
+                            <IconButton
+                              icon="checkbox-outline"
+                              size={0.035 * width}
+                            />
+                          )}
+                          {!joiner.approved && (
+                            <IconButton
+                              icon="checkbox-blank-outline"
+                              size={0.035 * width}
+                            />
+                          )}
 
-                    <View style={styles.statusContainer}>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        {joiner.approved && (
-                          <IconButton
-                            icon="checkbox-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-                        {!joiner.approved && (
-                          <IconButton
-                            icon="checkbox-blank-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-
-                        <Text style={styles.listingText}>Approved</Text>
+                          <Text style={styles.listingText}>Approved</Text>
+                        </View>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          {joiner.paid && (
+                            <IconButton
+                              icon="checkbox-outline"
+                              size={0.035 * width}
+                            />
+                          )}
+                          {!joiner.paid && (
+                            <IconButton
+                              icon="checkbox-blank-outline"
+                              size={0.035 * width}
+                            />
+                          )}
+                          <Text style={styles.listingText}>Paid</Text>
+                        </View>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          {joiner.collected && (
+                            <IconButton
+                              icon="checkbox-outline"
+                              size={0.035 * width}
+                            />
+                          )}
+                          {!joiner.collected && (
+                            <IconButton
+                              icon="checkbox-blank-outline"
+                              size={0.035 * width}
+                            />
+                          )}
+                          <Text style={styles.listingText}>Collected</Text>
+                        </View>
                       </View>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        {joiner.paid && (
-                          <IconButton
-                            icon="checkbox-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-                        {!joiner.paid && (
-                          <IconButton
-                            icon="checkbox-blank-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-                        <Text style={styles.listingText}>Paid</Text>
-                      </View>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        {joiner.collected && (
-                          <IconButton
-                            icon="checkbox-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-                        {!joiner.collected && (
-                          <IconButton
-                            icon="checkbox-blank-outline"
-                            size={0.035 * width}
-                          />
-                        )}
-                        <Text style={styles.listingText}>Collected</Text>
-                      </View>
-                    </View>
-                    {!joiner.approved && (
+                    )}
+                    {joiner.declinedReason == "" && !joiner.approved && (
                       <Text style={styles.actionText}>
                         Action Required: Approve Joiner Now
                       </Text>
@@ -598,7 +606,8 @@ const TrackScreen = ({ route, navigation }) => {
                         now.
                       </Text>
                     )}
-                    {readyForCollectionOld &&
+                    {joiner.declinedReason == "" &&
+                      readyForCollectionOld &&
                       joiner.deliveryProof == "" &&
                       !joiner.collected && (
                         <Text style={styles.actionText}>
@@ -784,6 +793,11 @@ const styles = StyleSheet.create({
   listingCreator: {
     fontFamily: "raleway-bold",
     color: "#B0C0F9",
+    fontSize: (30 * width) / height,
+  },
+  rejectText: {
+    fontFamily: "raleway-bold",
+    color: "#FF2400",
     fontSize: (30 * width) / height,
   },
   horizontalContainer: {
