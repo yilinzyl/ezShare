@@ -52,19 +52,36 @@ const TrackScreen = ({ route, navigation }) => {
     "Group buy cancelled",
   ];
 
-  const handleConfirmUpdate = () =>
-    Alert.alert(
-      "Confirm Update Status?",
-      "You will not be allowed to go backwards.",
-      [
+  const handleConfirmUpdate = () => {
+    if (newStatus == oldStatus || newStatus == "") {
+      Alert.alert("No change has been made", "Please select a new status", [
         {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
+          text: "Ok",
           style: "cancel",
         },
-        { text: "Confirm", onPress: handleUpdateStatus },
-      ]
-    );
+      ]);
+    } else if (!confirmed && !cancelled) {
+      Alert.alert("Please confirm group buy before updating status", "", [
+        {
+          text: "Ok",
+          style: "cancel",
+        },
+      ]);
+    } else {
+      Alert.alert(
+        "Confirm Update Status?",
+        "You will not be allowed to go backwards.",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          { text: "Confirm", onPress: handleUpdateStatus },
+        ]
+      );
+    }
+  };
 
   const handleConfirmConfirm = () =>
     Alert.alert(
@@ -132,31 +149,22 @@ const TrackScreen = ({ route, navigation }) => {
   };
 
   const handleUpdateStatus = () => {
-    if (newStatus == oldStatus || newStatus == "") {
-      Alert.alert("No change has been made", "Please select a new status", [
-        {
-          text: "Ok",
-          style: "cancel",
-        },
-      ]);
-    } else {
-      db.collection("listing")
-        .doc(listingId)
-        .update({
-          status: newStatus,
-          acceptingOrders: acceptingOrders,
-          readyForCollection: readyForCollection,
-          closed: closed,
-        })
-        .then(() =>
-          Alert.alert("Status Updated!", "", [
-            {
-              text: "Ok",
-              style: "cancel",
-            },
-          ])
-        );
-    }
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        status: newStatus,
+        acceptingOrders: acceptingOrders,
+        readyForCollection: readyForCollection,
+        closed: closed,
+      })
+      .then(() =>
+        Alert.alert("Status Updated!", "", [
+          {
+            text: "Ok",
+            style: "cancel",
+          },
+        ])
+      );
   };
 
   useEffect(() => {
