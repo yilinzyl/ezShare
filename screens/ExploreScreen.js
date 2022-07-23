@@ -251,6 +251,70 @@ const ExploreScreen = () => {
                     <Text style={styles.listingCreator}>
                       Created by {post.username}
                     </Text>
+                    <View style={styles.statusContainer}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        {post.confirmed && (
+                          <IconButton
+                            icon="checkbox-outline"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: 0,
+                            }}
+                          />
+                        )}
+                        {!post.confirmed && (
+                          <IconButton
+                            icon="checkbox-blank-outline"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: 0,
+                            }}
+                          />
+                        )}
+                      </View>
+                      {post.mailingMethod != "" && (
+                        <IconButton
+                          icon="truck"
+                          size={0.035 * width}
+                          style={{
+                            marginLeft: 0,
+                            marginRight: 0,
+                          }}
+                        />
+                      )}
+                      {post.collectionPoint != "" && (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <IconButton
+                            icon="map-marker"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.01 * width,
+                            }}
+                          />
+                          {post.collectionPoint.length > 35 && (
+                            <Text style={styles.statusText}>
+                              {post.collectionPoint.slice(0, 35)} ...
+                            </Text>
+                          )}
+                          {post.collectionPoint.length <= 35 && (
+                            <Text style={styles.statusText}>
+                              {post.collectionPoint}
+                            </Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -419,6 +483,16 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     color: "#B0C0F9",
     fontSize: (30 * width) / height,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    marginTop: -0.02 * width,
+  },
+  statusText: {
+    fontFamily: "raleway-regular",
+    color: "#707070",
+    fontSize: (20 * width) / height,
   },
   endPageContainer: {
     marginTop: 20,
