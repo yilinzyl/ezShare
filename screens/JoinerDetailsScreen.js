@@ -40,6 +40,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
   const [itemDescription, setItemDescription] = useState("");
   const [otherRequests, setItemRequests] = useState("");
   const [itemCost, setItemCost] = useState("");
+  const [totalCost, setTotalCost] = useState("");
   const [joinerName, setJoinerName] = useState("");
   const [joinerId, setJoinerId] = useState("");
   const [paid, setPaid] = useState(false);
@@ -52,6 +53,9 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
   const [image, setImage] = useState(null);
   const [paymentImage, setPaymentImage] = useState(null);
   const [deliveryImage, setDeliveryImage] = useState(null);
+  const [collectionMethod, setCollectionMethod] = useState("");
+  const [address, setAddress] = useState("");
+  const [contact, setContact] = useState("");
   const [posting, setPosting] = useState(false);
 
   const getPaymentImage = () => {
@@ -299,11 +303,15 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
         setCollected(joinerData.collected);
         setApproved(joinerData.approved);
         setPaid(joinerData.paid);
-        setLoadingJoinerInfo(false);
         setDeliveryProof(joinerData.deliveryProof);
         setPaymentProof(joinerData.paymentProof);
         setHasPaymentProof(joinerData.paymentProof != "");
         setHasDeliveryProof(joinerData.deliveryProof != "");
+        setContact(joinerData.contact);
+        setTotalCost(joinerData.totalCost);
+        setCollectionMethod(joinerData.collectionMethod);
+        setAddress(joinerData.address);
+        setLoadingJoinerInfo(false);
       });
     const subscriberListing = db
       .collection("listing")
@@ -430,6 +438,50 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           <Text style={styles.info}>{itemDescription}</Text>
           <Text style={styles.infoHeader}>Item Cost</Text>
           <Text style={styles.info}>S$ {itemCost}</Text>
+          <Text style={styles.info}>Total cost: S$ {totalCost}</Text>
+          <Text style={styles.infoHeader}>Contact Details</Text>
+          <Text style={styles.info}>{contact}</Text>
+          <Text style={styles.infoHeader}>Collection Method</Text>
+          {collectionMethod == "MeetUp" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="map-marker"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>Meet-up</Text>
+            </View>
+          )}
+          {collectionMethod == "Mailing" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="truck"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>Mail to: {address}</Text>
+            </View>
+          )}
           <Text style={styles.infoHeader}>Other Requests</Text>
           <Text style={styles.info}>{otherRequests}</Text>
           {hasPaymentProof && (
@@ -538,9 +590,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                     onPress={handleDeliveryProofButton}
                     style={styles.submitButton}
                   >
-                    <Text style={styles.buttonText}>
-                      Submit
-                    </Text>
+                    <Text style={styles.buttonText}>Submit</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -738,5 +788,12 @@ const styles = StyleSheet.create({
   },
   buttonBottom: {
     height: 0.05 * height,
+  },
+  collectionInfo: {
+    fontFamily: "raleway-regular",
+    fontSize: 16,
+    marginLeft: width * 0.05,
+    marginBottom: 15,
+    marginRight: width * 0.15,
   },
 });

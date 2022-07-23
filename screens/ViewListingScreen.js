@@ -53,6 +53,8 @@ const ViewListingScreen = ({ route, navigation }) => {
   const [approved, setApproved] = useState(false);
   const [joinedId, setJoinedId] = useState("");
   const [contact, setContact] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
   const getImage = (listingId) => {
     cloudStorage
@@ -101,6 +103,8 @@ const ViewListingScreen = ({ route, navigation }) => {
         );
         setPaymentDetails(listingData.paymentDetails);
         setContact(listingData.contact);
+        setConfirmed(listingData.confirmed);
+        setCancelled(listingData.cancelled);
         setLoading(false);
       });
 
@@ -161,6 +165,28 @@ const ViewListingScreen = ({ route, navigation }) => {
               />
             )}
           </View>
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            {confirmed && (
+              <IconButton
+                icon="checkbox-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            {!confirmed && !cancelled && (
+              <IconButton
+                icon="checkbox-blank-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            {!cancelled && <Text style={styles.info}>Confirmed</Text>}
+          </View>
+          {cancelled && (
+            <Text style={styles.cancelledText}>
+              This group buy has been cancelled.
+            </Text>
+          )}
           <Text style={styles.infoHeader}>Category</Text>
           <Text style={styles.info}>{category}</Text>
           <Text style={styles.infoHeader}>Status</Text>
@@ -352,5 +378,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: "center",
     textAlign: "center",
+  },
+  cancelledText: {
+    fontFamily: "raleway-bold",
+    color: "red",
+    marginLeft: width * 0.05,
+    fontSize: 16,
   },
 });
