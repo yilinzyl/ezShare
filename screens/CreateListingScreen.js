@@ -618,18 +618,6 @@ const CreateListingScreen = () => {
         <TouchableOpacity
           onPress={handleCreateListing}
           style={styles.createButton}
-          // onPress={() => {
-          //   console.log(
-          //     db
-          //       .collection("listing")
-          //       .doc("test")
-          //       .get()
-          //       .then(
-          //         (x) => console.log(x.data()),
-          //         (x) => console.log("fail")
-          //       )
-          //   );
-          // }}
         >
           <Text style={styles.buttonText}>Create</Text>
         </TouchableOpacity>

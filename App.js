@@ -17,12 +17,14 @@ import ViewListingScreen from "./screens/ViewListingScreen";
 import ViewNewListingScreen from "./screens/ViewNewListingScreen";
 import PasswordScreen from "./screens/PasswordScreen";
 import UserSearchScreen from "./screens/UserSearchScreen";
-import UserInfoScreen from "./screens/UserInfoScreen";
+import UserListingsScreen from "./screens/UserListingsScreen";
+import UserReviewScreen from "./screens/UserReviewsScreen";
 import TrackScreen from "./screens/TrackScreen";
 
 import * as Font from "expo-font";
 import AppLoading from "expo-app-loading";
 import JoinerDetails from "./screens/JoinerDetailsScreen";
+import CreateReviewScreen from "./screens/CreateReviewScreen";
 
 // Adding custom fonts to the project
 // Only included regular and bold for now
@@ -123,8 +125,18 @@ export default function App() {
           />
           <Stack.Screen
             options={{ headerShown: false }}
-            name="User Info"
-            component={UserInfoScreen}
+            name="User Listings"
+            component={UserListingsScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="User Reviews"
+            component={UserReviewScreen}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Create Review"
+            component={CreateReviewScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

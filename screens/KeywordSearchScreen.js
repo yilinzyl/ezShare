@@ -48,8 +48,23 @@ const KeywordSearchScreen = () => {
 
   if (loading) {
     return (
-      <View>
-        <Text style={styles.header}>"Loading..."</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "raleway-bold",
+            color: "#b8c4fc",
+            fontSize: (50 * width) / height,
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </Text>
       </View>
     );
   }
