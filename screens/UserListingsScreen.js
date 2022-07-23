@@ -13,7 +13,7 @@ import { auth, db } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton, Button } from "react-native-paper";
-import logo from "../assets/lazada.jpg";
+import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
 var width = Dimensions.get("window").width;
@@ -21,7 +21,7 @@ var width = Dimensions.get("window").width;
 // Variable height of current window
 var height = Dimensions.get("window").height;
 
-const UserInfoScreen = ({ route, navigation }) => {
+const UserListingsScreen = ({ route, navigation }) => {
   const { userId } = route.params;
   const user = auth.currentUser;
   const [userName, setUserName] = useState("");
@@ -51,7 +51,7 @@ const UserInfoScreen = ({ route, navigation }) => {
       subscriber1();
       subscriberListings();
     };
-  });
+  }, ["userId"]);
 
   return (
     <View style={styles.background}>
@@ -64,10 +64,25 @@ const UserInfoScreen = ({ route, navigation }) => {
           onPress={() => navigation.goBack()}
         />
         <View>
-          <Text style={styles.smallHeader}>View Posts by</Text>
           <Text style={styles.header}>{userName}</Text>
         </View>
       </View>
+      <ScrollView horizontal={true}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("User Reviews", { userId: userId })
+          }
+          style={styles.myListingsButton}
+        >
+          <Text style={styles.horizontalButtonText}>Reviews</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => console.log("settings")}
+          style={styles.settingsButton}
+        >
+          <Text style={styles.horizontalButtonText}>Listings</Text>
+        </TouchableOpacity>
+      </ScrollView>
       {posts
         .filter((post) => post.user == userId && !post.closed)
         .map((post) => (
@@ -118,7 +133,7 @@ const UserInfoScreen = ({ route, navigation }) => {
   );
 };
 
-export default UserInfoScreen;
+export default UserListingsScreen;
 
 const styles = StyleSheet.create({
   background: {
@@ -184,5 +199,30 @@ const styles = StyleSheet.create({
   appLogo: {
     height: height * 0.13,
     width: height * 0.13,
+  },
+  settingsButton: {
+    height: height * 0.07,
+    width: width * 0.5,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomColor: "#F898A3",
+    borderBottomWidth: 3,
+    backgroundColor: "#f0f0f0",
+  },
+  myListingsButton: {
+    height: height * 0.07,
+    width: width * 0.5,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomColor: "#f2f2f2",
+    borderBottomWidth: 3,
+    borderRightColor: "#f2f2f2",
+    borderRightWidth: 3,
+  },
+  horizontalButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#262626",
+    fontSize: (34 * width) / height,
+    //alignSelf: "flex-start"
   },
 });

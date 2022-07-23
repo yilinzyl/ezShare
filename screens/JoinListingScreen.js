@@ -39,9 +39,6 @@ const JoinListingScreen = ({ route, navigation }) => {
   const [itemCost, setItemCost] = useState("");
   const [otherCosts, setOtherCosts] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
-  const [currentAmount, setCurrentAmount] = useState(0);
-  const [targetAmount, setTargetAmount] = useState(0);
-  const [status, setStatus] = useState("");
   const [contact, setContact] = useState("");
   const [address, setAddress] = useState("");
   const [collectionMethods, setCollectionMethods] = useState("");

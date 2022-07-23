@@ -461,7 +461,23 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={{ color: "#696969" }}>Track: </Text>
               {listingName}
             </Text>
-            <Text style={styles.createdBy}>Joined by {joinerName}</Text>
+            <Text style={styles.createdBy}>
+              Joined by{" "}
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("User Listings", { userId: joinerId })
+                }
+              >
+                <Text
+                  style={[
+                    styles.createdBy,
+                    { textDecorationLine: "underline" },
+                  ]}
+                >
+                  {joinerName}
+                </Text>
+              </TouchableOpacity>
+            </Text>
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
@@ -854,6 +870,22 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.buttonText}>Verify Collection</Text>
             </TouchableOpacity>
           )}
+          {approved && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("Create Review", {
+                    listingId: listingId,
+                    joinerId: joinerId,
+                    joinerName: joinerName,
+                  })
+                }
+                style={styles.existingUserButton}
+              >
+                <Text style={styles.reviewText}>Leave a review here</Text>
+              </TouchableOpacity>
+            </View>
+          )}
           <View style={styles.buttonBottom}></View>
         </ScrollView>
       </View>
@@ -1026,6 +1058,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textDecorationLine: "underline",
     color: "#404040",
+    margin: 0.015 * height,
+  },
+  reviewText: {
+    fontFamily: "raleway-regular",
+    textAlign: "center",
+    textDecorationLine: "underline",
+    color: "#F898A3",
     margin: 0.015 * height,
   },
 });

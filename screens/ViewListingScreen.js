@@ -163,7 +163,23 @@ const ViewListingScreen = ({ route, navigation }) => {
           />
           <View>
             <Text style={styles.header}>{listingName}</Text>
-            <Text style={styles.createdBy}>Created by {listingOwnerName}</Text>
+            <Text style={styles.createdBy}>
+              Created by{" "}
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("User Listings", { userId: listingOwner })
+                }
+              >
+                <Text
+                  style={[
+                    styles.createdBy,
+                    { textDecorationLine: "underline" },
+                  ]}
+                >
+                  {listingOwnerName}
+                </Text>
+              </TouchableOpacity>
+            </Text>
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>

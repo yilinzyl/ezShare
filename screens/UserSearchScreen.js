@@ -7,7 +7,7 @@ import {
   Dimensions,
   ScrollView,
   Button,
-  Image
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase";
@@ -47,7 +47,26 @@ const UserSearchScreen = () => {
   }, []);
 
   if (loading) {
-    return <Text> Loading... </Text>;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "raleway-bold",
+            color: "#b8c4fc",
+            fontSize: (50 * width) / height,
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </Text>
+      </View>
+    );
   }
   return (
     <View style={styles.background}>
@@ -90,7 +109,7 @@ const UserSearchScreen = () => {
             .map((post) => (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate("User Info", { userId: post.key })
+                  navigation.navigate("User Listings", { userId: post.key })
                 }
               >
                 <View key={post.uid} style={styles.listing}>
@@ -169,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     width: 0.8 * width,
-    marginLeft: 0.075 * width
+    marginLeft: 0.075 * width,
   },
   header: {
     fontFamily: "raleway-bold",
