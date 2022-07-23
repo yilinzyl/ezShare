@@ -118,6 +118,7 @@ const TrackScreen = ({ route, navigation }) => {
       .update({
         cancelled: true,
         closed: true,
+        acceptingOrders: false,
         status: "Group buy cancelled",
       })
       .then(() =>
