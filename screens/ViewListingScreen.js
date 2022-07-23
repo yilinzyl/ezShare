@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
   ScrollView,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
@@ -16,7 +15,6 @@ import { auth, db, cloudStorage } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
@@ -39,6 +37,7 @@ const ViewListingScreen = ({ route, navigation }) => {
   const [cutOffDate, setCutOffDate] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
   const [otherCosts, setOtherCosts] = useState(0);
+  const [mailingMethod, setMailingMethod] = useState("");
   const [collectionPoint, setCollectionPoint] = useState("");
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [currentAmount, setCurrentAmount] = useState(0);
@@ -53,6 +52,7 @@ const ViewListingScreen = ({ route, navigation }) => {
   const [paymentDetails, setPaymentDetails] = useState("");
   const [approved, setApproved] = useState(false);
   const [joinedId, setJoinedId] = useState("");
+  const [contact, setContact] = useState("");
 
   const getImage = (listingId) => {
     cloudStorage
@@ -85,6 +85,7 @@ const ViewListingScreen = ({ route, navigation }) => {
         );
         setTargetAmount(listingData.targetAmount);
         setOtherCosts(listingData.otherCosts);
+        setMailingMethod(listingData.mailingMethod);
         setCollectionPoint(listingData.collectionPoint);
         setDeliveryFee(listingData.deliveryFee);
         setCurrentAmount(listingData.currentAmount);
@@ -99,6 +100,7 @@ const ViewListingScreen = ({ route, navigation }) => {
             : "Cash on Collect"
         );
         setPaymentDetails(listingData.paymentDetails);
+        setContact(listingData.contact);
         setLoading(false);
       });
 
@@ -175,14 +177,61 @@ const ViewListingScreen = ({ route, navigation }) => {
           <Text style={styles.info}>S$ {deliveryFee}</Text>
           <Text style={styles.infoHeader}>Commission Fee</Text>
           <Text style={styles.info}>S$ {otherCosts}</Text>
-          <Text style={styles.infoHeader}>Collection Point</Text>
-          <Text style={styles.info}>{collectionPoint}</Text>
+          <Text style={styles.infoHeader}>Collection Method</Text>
+          {mailingMethod != "" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="truck"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>Mailing</Text>
+            </View>
+          )}
+          {collectionPoint != "" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="map-marker"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>
+                Meet-up at: {collectionPoint}
+              </Text>
+            </View>
+          )}
           <Text style={styles.infoHeader}>Payment Method</Text>
           <Text style={styles.info}>{paymentMethod}</Text>
-          {approved && (
+          {approved && paymentMethod != "Cash on Collect" && (
             <View>
               <Text style={styles.infoHeader}>Payment Details</Text>
               <Text style={styles.info}>{paymentDetails}</Text>
+            </View>
+          )}
+          {approved && (
+            <View>
+              <Text style={styles.infoHeader}>Contact Details</Text>
+              <Text style={styles.info}>{contact}</Text>
             </View>
           )}
           {acceptingOrders && user.uid != listingOwner && joinedId == "" && (
@@ -266,6 +315,13 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginBottom: 15,
     marginRight: width * 0.05,
+  },
+  collectionInfo: {
+    fontFamily: "raleway-regular",
+    fontSize: 16,
+    marginLeft: width * 0.05,
+    marginBottom: 15,
+    marginRight: width * 0.15,
   },
   infoHeader: {
     fontFamily: "raleway-bold",
