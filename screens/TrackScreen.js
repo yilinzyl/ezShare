@@ -139,12 +139,16 @@ const TrackScreen = ({ route, navigation }) => {
         status: "Group buy cancelled",
       })
       .then(() =>
-        Alert.alert("Group buy cancelled.", "", [
-          {
-            text: "Ok",
-            style: "cancel",
-          },
-        ])
+        Alert.alert(
+          "Group buy cancelled.",
+          "Please contact joiners to refund any payment made.",
+          [
+            {
+              text: "Ok",
+              style: "cancel",
+            },
+          ]
+        )
       );
   };
 

@@ -80,7 +80,7 @@ const JoinListingScreen = ({ route, navigation }) => {
         paymentProof: "",
         deliveryProof: "",
         completed: false,
-        declined: false,
+        declinedReason: "",
         contact: contact,
         address: address,
         collectionMethod: selectedCollection,

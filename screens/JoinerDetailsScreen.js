@@ -56,6 +56,8 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
   const [collectionMethod, setCollectionMethod] = useState("");
   const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
+  const [declinedReason, setDeclinedReason] = useState("");
+  const [hasDeclined, setHasDeclined] = useState(false);
   const [posting, setPosting] = useState(false);
 
   const getPaymentImage = () => {
@@ -146,6 +148,29 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
       })
       .then(() => {
         console.log("Joiner approved!");
+      });
+  };
+
+  const handleDeclineButton = () =>
+    Alert.alert("Confirm order reject?", "This action cannot be reversed.", [
+      {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      { text: "Confirm", onPress: markAsDeclined },
+    ]);
+
+  const markAsDeclined = () => {
+    db.collection("joined")
+      .doc(joinedId)
+      .update({
+        approved: false,
+        declinedReason: declinedReason == "" ? "-" : declinedReason,
+        completed: false,
+      })
+      .then(() => {
+        setHasDeclined(true);
       });
   };
 
@@ -311,6 +336,8 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
         setTotalCost(joinerData.totalCost);
         setCollectionMethod(joinerData.collectionMethod);
         setAddress(joinerData.address);
+        setDeclinedReason(joinerData.declinedReason);
+        setHasDeclined(joinerData.declinedReason != "");
         setLoadingJoinerInfo(false);
       });
     const subscriberListing = db
@@ -371,60 +398,89 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
-          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-            {approved && (
-              <IconButton
-                icon="checkbox-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            {!approved && (
-              <IconButton
-                icon="checkbox-blank-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            <Text style={styles.info}>Approved</Text>
-          </View>
+          {hasDeclined && (
+            <View>
+              <Text style={styles.rejectedText}>
+                Creator has rejected this order.
+              </Text>
+              <Text style={styles.rejectedText}>Reason: {declinedReason} </Text>
+            </View>
+          )}
+          {!hasDeclined && (
+            <View>
+              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                {approved && (
+                  <IconButton
+                    icon="checkbox-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                {!approved && (
+                  <IconButton
+                    icon="checkbox-blank-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                <Text style={styles.info}>Approved</Text>
+              </View>
 
-          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-            {paid && (
-              <IconButton
-                icon="checkbox-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            {!paid && (
-              <IconButton
-                icon="checkbox-blank-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            <Text style={styles.info}>Paid</Text>
-          </View>
+              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                {paid && (
+                  <IconButton
+                    icon="checkbox-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                {!paid && (
+                  <IconButton
+                    icon="checkbox-blank-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                <Text style={styles.info}>Paid</Text>
+              </View>
 
-          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-            {collected && (
-              <IconButton
-                icon="checkbox-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            {!collected && (
-              <IconButton
-                icon="checkbox-blank-outline"
-                size={0.05 * width}
-                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
-              />
-            )}
-            <Text style={styles.info}>Collected</Text>
-          </View>
-
+              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                {collected && (
+                  <IconButton
+                    icon="checkbox-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                {!collected && (
+                  <IconButton
+                    icon="checkbox-blank-outline"
+                    size={0.05 * width}
+                    style={{
+                      marginLeft: width * 0.05,
+                      marginRight: width * -0.05,
+                    }}
+                  />
+                )}
+                <Text style={styles.info}>Collected</Text>
+              </View>
+            </View>
+          )}
           <Text style={styles.infoHeader}>Item Name</Text>
           <Text style={styles.info}>{itemName}</Text>
           <Text style={styles.infoHeader}>Item Link</Text>
@@ -513,13 +569,40 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
             </View>
           )}
 
-          {user.uid == listingUserId && !approved && (
+          {user.uid == listingUserId && !approved && !hasDeclined && (
             <TouchableOpacity
               onPress={handleApproveButton}
               style={styles.updateButton}
             >
               <Text style={styles.buttonText}>Approve Order</Text>
             </TouchableOpacity>
+          )}
+          {user.uid == listingUserId && !approved && !hasDeclined && (
+            <View
+              style={{
+                marginTop: height * 0.05,
+                flexDirection: "row",
+                alignSelf: "center",
+                justifyContent: "space-around",
+                alignItems: "center",
+              }}
+            >
+              <View style={styles.declineInputBox}>
+                <TextInput
+                  multiline
+                  placeholder="Enter reason"
+                  value={declinedReason}
+                  onChangeText={(text) => setDeclinedReason(text)}
+                  style={styles.input}
+                />
+              </View>
+              <TouchableOpacity
+                onPress={handleDeclineButton}
+                style={styles.declineButton}
+              >
+                <Text style={styles.declineButtonText}>Reject Order</Text>
+              </TouchableOpacity>
+            </View>
           )}
           {user.uid == listingUserId && approved && !paid && (
             <TouchableOpacity
@@ -764,6 +847,33 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
     borderRadius: 45,
   },
+  declineButton: {
+    backgroundColor: "#A0A0A0",
+    height: 50,
+    width: width * 0.3,
+    alignItems: "center",
+    alignSelf: "center",
+    justifyContent: "center",
+    marginTop: 15,
+    marginBottom: height * 0.02,
+    marginRight: width * 0.05,
+    borderRadius: 45,
+  },
+  declineButtonText: {
+    fontFamily: "raleway-bold",
+    color: "#F9FAFE",
+    fontSize: 15,
+  },
+  declineInputBox: {
+    borderColor: "#A0A0A0",
+    borderWidth: 2,
+    borderRadius: 10,
+    width: width * 0.63,
+    height: height * 0.06,
+    marginBottom: 13,
+    marginLeft: width * 0.05,
+    marginRight: width * 0.05,
+  },
   buttonText: {
     fontFamily: "raleway-bold",
     color: "#F9FAFE",
@@ -795,5 +905,11 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginBottom: 15,
     marginRight: width * 0.15,
+  },
+  rejectedText: {
+    fontFamily: "raleway-bold",
+    color: "red",
+    marginLeft: width * 0.05,
+    fontSize: 16,
   },
 });
