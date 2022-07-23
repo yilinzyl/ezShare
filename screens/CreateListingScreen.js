@@ -168,7 +168,7 @@ const CreateListingScreen = () => {
             uploadImage(image, docRef.id);
             navigation.navigate("View New Listing", { listingId: docRef.id });
           } else {
-            navigation.navigate("View Listing", { listingId: docRef.id });
+            navigation.navigate("View New Listing", { listingId: docRef.id });
           }
         });
     }

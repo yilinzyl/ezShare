@@ -29,7 +29,10 @@ const HomeScreen = () => {
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [listingIds, setlistingIds] = useState([]);
+
+  const [acceptedListingIds, setAcceptedListingIds] = useState([]);
+  const [declinedListingIds, setDeclinedListingIds] = useState([]);
+  const [pendingListingIds, setPendingListingIds] = useState([]);
 
   useEffect(() => {
     const getPostsFromFirebase = [];
@@ -45,17 +48,32 @@ const HomeScreen = () => {
         setPosts(getPostsFromFirebase);
         setLoadingListings(false);
       });
-    const getListingIdsFromFirebase = [];
+    const getAcceptedListingIdsFromFirebase = [];
+    const getDeclinedListingIdsFromFirebase = [];
+    const getPendingListingIdsFromFirebase = [];
     const subscriberPosts = db
       .collection("joined")
       .onSnapshot((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const joinedData = doc.data();
-          if (user.uid == joinedData.userID && !joinedData.completed) {
-            getListingIdsFromFirebase.push(joinedData.listingID);
+          if (
+            user.uid == joinedData.userID &&
+            !joinedData.completed &&
+            !joinedData.hidden
+          ) {
+            if (joinedData.accepted) {
+              getAcceptedListingIdsFromFirebase.push(joinedData.listingID);
+            }
+            if (joinedData.declinedReason != "") {
+              getDeclinedListingIdsFromFirebase.push(joinedData.listingID);
+            } else {
+              getPendingListingIdsFromFirebase.push(joinedData.listingID);
+            }
           }
         });
-        setlistingIds(getListingIdsFromFirebase);
+        setAcceptedListingIds(getAcceptedListingIdsFromFirebase);
+        setDeclinedListingIds(getDeclinedListingIdsFromFirebase);
+        setPendingListingIds(getPendingListingIdsFromFirebase);
         setLoadingJoiners(false);
       });
     return () => {
@@ -66,8 +84,23 @@ const HomeScreen = () => {
 
   if (loadingListings || loadingJoiners) {
     return (
-      <View>
-        <Text style={styles.header}>Welcome to ezShare!</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "raleway-bold",
+            color: "#b8c4fc",
+            fontSize: (50 * width) / height,
+            textAlign: "center",
+          }}
+        >
+          Welcome to ezShare!
+        </Text>
       </View>
     );
   }
@@ -127,73 +160,59 @@ const HomeScreen = () => {
                     </Text>
                   )}
                   <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon="timer-sand"
+                      size={0.035 * width}
+                      style={{
+                        marginLeft: 0,
+                        marginRight: -0.005 * width,
+                        marginTop: 0.005 * width,
+                        marginBottom: -0.005 * width,
+                      }}
+                    />
+                    <Text style={styles.statusText}>
+                      {new Date(
+                        post.cutOffDate.seconds * 1000 +
+                          post.cutOffDate.nanoseconds / 1000000
+                      ).toString()}
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {post.confirmed && (
+                      <IconButton
+                        icon="progress-check"
+                        size={0.035 * width}
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                    )}
+                    {!post.confirmed && (
+                      <IconButton
+                        icon="progress-question"
+                        size={0.035 * width}
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                    )}
+                    <Text style={styles.statusText}>{post.status}</Text>
+                  </View>
                 </View>
               </View>
             </TouchableOpacity>
           ))}
         <Text style={styles.infoHeader}>Joined Listings</Text>
-        <Text style={styles.info}>Ready For Collection</Text>
         {posts
           .filter(
-            (post) =>
-              listingIds.includes(post.key) &&
-              !post.closed &&
-              post.readyForCollection
-          )
-          .map((post) => (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate("View Listing", { listingId: post.key })
-              }
-            >
-              <View key={post.user + post.listDate} style={styles.listing}>
-                {/* temporary image for testing purposes */}
-                <Image source={logo} style={styles.appLogo} />
-                <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 25 && (
-                    <Text style={styles.listingTitle}>
-                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
-                    </Text>
-                  )}
-                  {post.listingName.length > 25 && (
-                    <Text style={styles.listingTitle}>
-                      {post.listingName
-                        .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 30)}
-                      ...
-                    </Text>
-                  )}
-                  {post.listingDescription.length <= 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
-                    </Text>
-                  )}
-                  {post.listingDescription.length > 30 && (
-                    <Text style={styles.listingText}>
-                      {post.listingDescription
-                        .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 30)}
-                      ...
-                    </Text>
-                  )}
-                  <Text style={styles.listingText}>{post.category}</Text>
-                  <Text style={styles.listingCreator}>
-                    Created by {post.username}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        <Text style={styles.info}>Pending</Text>
-        {posts
-          .filter(
-            (post) =>
-              listingIds.includes(post.key) &&
-              !post.closed &&
-              !post.readyForCollection
+            (post) => acceptedListingIds.includes(post.key) && !post.closed
           )
           .map((post) => (
             <TouchableOpacity
@@ -231,10 +250,359 @@ const HomeScreen = () => {
                       ...
                     </Text>
                   )}
-                  <Text style={styles.listingText}>{post.category}</Text>
                   <Text style={styles.listingCreator}>
                     Created by {post.username}
                   </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon="sticker-check-outline"
+                      size={0.035 * width}
+                      style={{
+                        marginLeft: 0,
+                        marginRight: -0.005 * width,
+                        marginTop: 0.005 * width,
+                        marginBottom: -0.005 * width,
+                      }}
+                    />
+                    <Text style={styles.statusText}>Order accepted</Text>
+                  </View>
+                  {post.status != "Ready for Collection" &&
+                    post.status != "Group buy cancelled" && (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {post.confirmed && (
+                          <IconButton
+                            icon="progress-check"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        {!post.confirmed && (
+                          <IconButton
+                            icon="progress-question"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        <Text style={styles.statusText}>{post.status}</Text>
+                      </View>
+                    )}
+                  {post.status == "Ready for Collection" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="check-circle-outline"
+                        size={0.035 * width}
+                        color="green"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "green" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
+                  {post.status == "Group buy cancelled" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="progress-alert"
+                        size={0.035 * width}
+                        color="red"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "red" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        {posts
+          .filter(
+            (post) => pendingListingIds.includes(post.key) && !post.closed
+          )
+          .map((post) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("View Listing", { listingId: post.key })
+              }
+            >
+              <View key={post.listingDate + post.user} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  <Text style={styles.listingCreator}>
+                    Created by {post.username}
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon="sticker-outline"
+                      size={0.035 * width}
+                      style={{
+                        marginLeft: 0,
+                        marginRight: -0.005 * width,
+                        marginTop: 0.005 * width,
+                        marginBottom: -0.005 * width,
+                      }}
+                    />
+                    <Text style={styles.statusText}>Pending Acceptance</Text>
+                  </View>
+                  {post.status != "Ready for Collection" &&
+                    post.status != "Group buy cancelled" && (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {post.confirmed && (
+                          <IconButton
+                            icon="progress-check"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        {!post.confirmed && (
+                          <IconButton
+                            icon="progress-question"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        <Text style={styles.statusText}>{post.status}</Text>
+                      </View>
+                    )}
+                  {post.status == "Ready for Collection" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="check-circle-outline"
+                        size={0.035 * width}
+                        color="green"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "green" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
+                  {post.status == "Group buy cancelled" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="progress-alert"
+                        size={0.035 * width}
+                        color="red"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "red" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        {posts
+          .filter((post) => declinedListingIds.includes(post.key))
+          .map((post) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("View Listing", { listingId: post.key })
+              }
+            >
+              <View key={post.listingDate + post.user} style={styles.listing}>
+                {/* temporary image for testing purposes */}
+                <Image source={logo} style={styles.appLogo} />
+                <View style={styles.listingTextContainer}>
+                  {post.listingName.length <= 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingName.length > 25 && (
+                    <Text style={styles.listingTitle}>
+                      {post.listingName
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  {post.listingDescription.length <= 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
+                    </Text>
+                  )}
+                  {post.listingDescription.length > 30 && (
+                    <Text style={styles.listingText}>
+                      {post.listingDescription
+                        .replace(/(\r\n|\n|\r)/gm, " ")
+                        .slice(0, 30)}
+                      ...
+                    </Text>
+                  )}
+                  <Text style={styles.listingCreator}>
+                    Created by {post.username}
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <IconButton
+                      icon="sticker-alert-outline"
+                      size={0.035 * width}
+                      color="red"
+                      style={{
+                        marginLeft: 0,
+                        marginRight: -0.005 * width,
+                        marginTop: 0.005 * width,
+                        marginBottom: -0.005 * width,
+                      }}
+                    />
+                    <Text style={[styles.statusText, { color: "red" }]}>
+                      Order Rejected
+                    </Text>
+                  </View>
+                  {post.status != "Ready for Collection" &&
+                    post.status != "Group buy cancelled" && (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        {post.confirmed && (
+                          <IconButton
+                            icon="progress-check"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        {!post.confirmed && (
+                          <IconButton
+                            icon="progress-question"
+                            size={0.035 * width}
+                            style={{
+                              marginLeft: 0,
+                              marginRight: -0.005 * width,
+                              marginTop: -0.005 * width,
+                              marginBottom: -0.005 * width,
+                            }}
+                          />
+                        )}
+                        <Text style={styles.statusText}>{post.status}</Text>
+                      </View>
+                    )}
+                  {post.status == "Ready for Collection" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="check-circle-outline"
+                        size={0.035 * width}
+                        color="green"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "green" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
+                  {post.status == "Group buy cancelled" && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <IconButton
+                        icon="progress-alert"
+                        size={0.035 * width}
+                        color="red"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                      <Text style={[styles.statusText, { color: "red" }]}>
+                        {post.status}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </TouchableOpacity>
@@ -362,5 +730,10 @@ const styles = StyleSheet.create({
     fontFamily: "raleway-bold",
     color: "#B0C0F9",
     fontSize: (30 * width) / height,
+  },
+  statusText: {
+    fontFamily: "raleway-regular",
+    color: "#707070",
+    fontSize: (20 * width) / height,
   },
 });

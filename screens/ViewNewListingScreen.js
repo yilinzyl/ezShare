@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
   ScrollView,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { firestore } from "firebase/firestore";
@@ -16,7 +15,6 @@ import { auth, db, cloudStorage } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { IconButton } from "react-native-paper";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import logo from "../assets/default-listing-icon.png";
 
 // Variable width of current window
@@ -25,7 +23,7 @@ var width = Dimensions.get("window").width;
 // Variable height of current window
 var height = Dimensions.get("window").height;
 
-const ViewNewListingScreen = ({ route, navigation }) => {
+const ViewListingScreen = ({ route, navigation }) => {
   const user = auth.currentUser;
   //const navigation = useNavigation();
 
@@ -39,6 +37,7 @@ const ViewNewListingScreen = ({ route, navigation }) => {
   const [cutOffDate, setCutOffDate] = useState(0);
   const [targetAmount, setTargetAmount] = useState(0);
   const [otherCosts, setOtherCosts] = useState(0);
+  const [mailingMethod, setMailingMethod] = useState("");
   const [collectionPoint, setCollectionPoint] = useState("");
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [currentAmount, setCurrentAmount] = useState(0);
@@ -53,6 +52,9 @@ const ViewNewListingScreen = ({ route, navigation }) => {
   const [paymentDetails, setPaymentDetails] = useState("");
   const [approved, setApproved] = useState(false);
   const [joinedId, setJoinedId] = useState("");
+  const [contact, setContact] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
   const getImage = (listingId) => {
     cloudStorage
@@ -85,6 +87,7 @@ const ViewNewListingScreen = ({ route, navigation }) => {
         );
         setTargetAmount(listingData.targetAmount);
         setOtherCosts(listingData.otherCosts);
+        setMailingMethod(listingData.mailingMethod);
         setCollectionPoint(listingData.collectionPoint);
         setDeliveryFee(listingData.deliveryFee);
         setCurrentAmount(listingData.currentAmount);
@@ -99,6 +102,9 @@ const ViewNewListingScreen = ({ route, navigation }) => {
             : "Cash on Collect"
         );
         setPaymentDetails(listingData.paymentDetails);
+        setContact(listingData.contact);
+        setConfirmed(listingData.confirmed);
+        setCancelled(listingData.cancelled);
         setLoading(false);
       });
 
@@ -125,8 +131,23 @@ const ViewNewListingScreen = ({ route, navigation }) => {
 
   if (loading) {
     return (
-      <View>
-        <Text style={styles.header}>"Loading..."</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "raleway-bold",
+            color: "#b8c4fc",
+            fontSize: (50 * width) / height,
+            textAlign: "center",
+          }}
+        >
+          Loading...
+        </Text>
       </View>
     );
   } else {
@@ -159,6 +180,28 @@ const ViewNewListingScreen = ({ route, navigation }) => {
               />
             )}
           </View>
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            {confirmed && (
+              <IconButton
+                icon="checkbox-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            {!confirmed && !cancelled && (
+              <IconButton
+                icon="checkbox-blank-outline"
+                size={0.05 * width}
+                style={{ marginLeft: width * 0.05, marginRight: width * -0.05 }}
+              />
+            )}
+            {!cancelled && <Text style={styles.info}>Confirmed</Text>}
+          </View>
+          {cancelled && (
+            <Text style={styles.cancelledText}>
+              This group buy has been cancelled.
+            </Text>
+          )}
           <Text style={styles.infoHeader}>Category</Text>
           <Text style={styles.info}>{category}</Text>
           <Text style={styles.infoHeader}>Status</Text>
@@ -175,14 +218,61 @@ const ViewNewListingScreen = ({ route, navigation }) => {
           <Text style={styles.info}>S$ {deliveryFee}</Text>
           <Text style={styles.infoHeader}>Commission Fee</Text>
           <Text style={styles.info}>S$ {otherCosts}</Text>
-          <Text style={styles.infoHeader}>Collection Point</Text>
-          <Text style={styles.info}>{collectionPoint}</Text>
+          <Text style={styles.infoHeader}>Collection Method</Text>
+          {mailingMethod != "" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="truck"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>Mailing</Text>
+            </View>
+          )}
+          {collectionPoint != "" && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginLeft: width * 0.05,
+                alignItems: "flex-end",
+              }}
+            >
+              <IconButton
+                icon="map-marker"
+                size={width * 0.08}
+                color="black"
+                style={{
+                  marginLeft: width * -0.02,
+                  marginRight: width * -0.02,
+                }}
+              />
+              <Text style={styles.collectionInfo}>
+                Meet-up at: {collectionPoint}
+              </Text>
+            </View>
+          )}
           <Text style={styles.infoHeader}>Payment Method</Text>
           <Text style={styles.info}>{paymentMethod}</Text>
-          {approved && (
+          {approved && paymentMethod != "Cash on Collect" && (
             <View>
               <Text style={styles.infoHeader}>Payment Details</Text>
               <Text style={styles.info}>{paymentDetails}</Text>
+            </View>
+          )}
+          {approved && (
+            <View>
+              <Text style={styles.infoHeader}>Contact Details</Text>
+              <Text style={styles.info}>{contact}</Text>
             </View>
           )}
           {acceptingOrders && user.uid != listingOwner && joinedId == "" && (
@@ -227,7 +317,7 @@ const ViewNewListingScreen = ({ route, navigation }) => {
   }
 };
 
-export default ViewNewListingScreen;
+export default ViewListingScreen;
 
 const styles = StyleSheet.create({
   background: {
@@ -267,6 +357,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginRight: width * 0.05,
   },
+  collectionInfo: {
+    fontFamily: "raleway-regular",
+    fontSize: 16,
+    marginLeft: width * 0.05,
+    marginBottom: 15,
+    marginRight: width * 0.15,
+  },
   infoHeader: {
     fontFamily: "raleway-bold",
     fontSize: 18,
@@ -296,5 +393,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: "center",
     textAlign: "center",
+  },
+  cancelledText: {
+    fontFamily: "raleway-bold",
+    color: "red",
+    marginLeft: width * 0.05,
+    fontSize: 16,
   },
 });
