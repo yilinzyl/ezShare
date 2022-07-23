@@ -58,6 +58,11 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
   const [contact, setContact] = useState("");
   const [declinedReason, setDeclinedReason] = useState("");
   const [hasDeclined, setHasDeclined] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [currentAmount, setCurrentAmount] = useState(0);
+  const [targetAmount, setTargetAmount] = useState(0);
+  const [status, setStatus] = useState("");
   const [posting, setPosting] = useState(false);
 
   const getPaymentImage = () => {
@@ -147,7 +152,23 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
         completed: approved && paid && collected,
       })
       .then(() => {
-        console.log("Joiner approved!");
+        updateListingDatabase();
+      });
+  };
+
+  const updateListingDatabase = () => {
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        currentAmount: parseFloat(currentAmount) + parseFloat(itemCost),
+        status:
+          parseFloat(currentAmount) + parseFloat(itemCost) >=
+          parseFloat(targetAmount)
+            ? "Accepting Orders - Target reached"
+            : status,
+      })
+      .then(() => {
+        console.log("Listing updated!");
       });
   };
 
@@ -197,6 +218,32 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
       })
       .then(() => {
         console.log("paid!");
+      });
+  };
+
+  const handleWithdrawButton = () =>
+    Alert.alert(
+      "Confirm withdraw?",
+      "This action cannot be reversed. Please ensure that all outstanding payments/refunds have been settled before withdrawing order.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: withdrawOrder },
+      ]
+    );
+
+  const withdrawOrder = () => {
+    db.collection("joined")
+      .doc(joinedId)
+      .update({
+        hidden: true,
+        completed: false,
+      })
+      .then(() => {
+        navigation.navigate("Home");
       });
   };
 
@@ -338,6 +385,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
         setAddress(joinerData.address);
         setDeclinedReason(joinerData.declinedReason);
         setHasDeclined(joinerData.declinedReason != "");
+        setHidden(joinerData.hidden);
         setLoadingJoinerInfo(false);
       });
     const subscriberListing = db
@@ -347,6 +395,10 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
         setListingUserId(listingData.user);
+        setCancelled(listingData.cancelled);
+        setTargetAmount(listingData.targetAmount);
+        setCurrentAmount(listingData.currentAmount);
+        setStatus(listingData.status);
         setLoadingListingInfo(false);
       });
     return () => {
@@ -413,12 +465,37 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
         <ScrollView style={styles.listingContainer}>
+          {cancelled && (
+            <View>
+              <Text style={styles.rejectedText}>
+                This group buy has been cancelled.
+              </Text>
+              <Text></Text>
+            </View>
+          )}
           {hasDeclined && (
             <View>
               <Text style={styles.rejectedText}>
                 Creator has rejected this order.
               </Text>
               <Text style={styles.rejectedText}>Reason: {declinedReason} </Text>
+              <Text></Text>
+            </View>
+          )}
+
+          {(hasDeclined || cancelled) && user.uid == joinerId && !hidden && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={handleWithdrawButton}
+                style={styles.existingUserButton}
+              >
+                <Text style={styles.withdrawText}>Withdraw Order</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {hidden && (
+            <View style={styles.buttonContainer}>
+              <Text style={styles.withdrawText}>Order Withdrawn.</Text>
             </View>
           )}
           {!hasDeclined && (
@@ -589,42 +666,48 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
             </View>
           )}
 
-          {user.uid == listingUserId && !approved && !hasDeclined && (
-            <TouchableOpacity
-              onPress={handleApproveButton}
-              style={styles.updateButton}
-            >
-              <Text style={styles.buttonText}>Approve Order</Text>
-            </TouchableOpacity>
-          )}
-          {user.uid == listingUserId && !approved && !hasDeclined && (
-            <View
-              style={{
-                marginTop: height * 0.02,
-                flexDirection: "row",
-                alignSelf: "center",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-            >
-              <View style={styles.declineInputBox}>
-                <TextInput
-                  multiline
-                  placeholder="Enter reason"
-                  value={declinedReason}
-                  onChangeText={(text) => setDeclinedReason(text)}
-                  style={styles.input}
-                />
-              </View>
+          {!cancelled &&
+            user.uid == listingUserId &&
+            !approved &&
+            !hasDeclined && (
               <TouchableOpacity
-                onPress={handleDeclineButton}
-                style={styles.declineButton}
+                onPress={handleApproveButton}
+                style={styles.updateButton}
               >
-                <Text style={styles.declineButtonText}>Reject Order</Text>
+                <Text style={styles.buttonText}>Approve Order</Text>
               </TouchableOpacity>
-            </View>
-          )}
-          {user.uid == listingUserId && approved && !paid && (
+            )}
+          {!cancelled &&
+            user.uid == listingUserId &&
+            !approved &&
+            !hasDeclined && (
+              <View
+                style={{
+                  marginTop: height * 0.02,
+                  flexDirection: "row",
+                  alignSelf: "center",
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                }}
+              >
+                <View style={styles.declineInputBox}>
+                  <TextInput
+                    multiline
+                    placeholder="Enter reason"
+                    value={declinedReason}
+                    onChangeText={(text) => setDeclinedReason(text)}
+                    style={styles.input}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={handleDeclineButton}
+                  style={styles.declineButton}
+                >
+                  <Text style={styles.declineButtonText}>Reject Order</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          {!cancelled && user.uid == listingUserId && approved && !paid && (
             <TouchableOpacity
               onPress={handlePaidButton}
               style={styles.updateButton}
@@ -632,7 +715,8 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
               <Text style={styles.buttonText}>Mark as Paid</Text>
             </TouchableOpacity>
           )}
-          {user.uid == listingUserId &&
+          {!cancelled &&
+            user.uid == listingUserId &&
             approved &&
             !collected &&
             !hasDeliveryProof && (
@@ -698,67 +782,71 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
                 </View>
               </View>
             )}
-          {user.uid == joinerId && approved && !paid && !hasPaymentProof && (
-            <View>
-              <View
-                style={{
-                  borderColor: "black",
-                  borderWidth: 1,
-                  marginLeft: width * 0.02,
-                  marginRight: width * 0.02,
-                  marginTop: height * 0.02,
-                  marginBottom: height * 0.02,
-                  alignItems: "center",
-                }}
-              >
+          {!cancelled &&
+            user.uid == joinerId &&
+            approved &&
+            !paid &&
+            !hasPaymentProof && (
+              <View>
                 <View
                   style={{
-                    marginTop: height * 0.05,
-                    flexDirection: "row",
-                    alignSelf: "center",
-                    justifyContent: "space-around",
+                    borderColor: "black",
+                    borderWidth: 1,
+                    marginLeft: width * 0.02,
+                    marginRight: width * 0.02,
+                    marginTop: height * 0.02,
+                    marginBottom: height * 0.02,
+                    alignItems: "center",
                   }}
                 >
-                  <View style={styles.inputBox}>
-                    <TextInput
-                      multiline
-                      placeholder="Comments"
-                      value={paymentProof}
-                      onChangeText={(text) => setPaymentProof(text)}
-                      style={styles.input}
+                  <View
+                    style={{
+                      marginTop: height * 0.05,
+                      flexDirection: "row",
+                      alignSelf: "center",
+                      justifyContent: "space-around",
+                    }}
+                  >
+                    <View style={styles.inputBox}>
+                      <TextInput
+                        multiline
+                        placeholder="Comments"
+                        value={paymentProof}
+                        onChangeText={(text) => setPaymentProof(text)}
+                        style={styles.input}
+                      />
+                    </View>
+                    <IconButton
+                      icon="camera"
+                      mode="contained-tonal"
+                      color="#B0C0F9"
+                      size={(60 * width) / height}
+                      onPress={takePhoto}
+                    />
+                    <IconButton
+                      icon="camera-burst"
+                      mode="contained-tonal"
+                      color="#B0C0F9"
+                      size={(60 * width) / height}
+                      onPress={pickImage}
                     />
                   </View>
-                  <IconButton
-                    icon="camera"
-                    mode="contained-tonal"
-                    color="#B0C0F9"
-                    size={(60 * width) / height}
-                    onPress={takePhoto}
-                  />
-                  <IconButton
-                    icon="camera-burst"
-                    mode="contained-tonal"
-                    color="#B0C0F9"
-                    size={(60 * width) / height}
-                    onPress={pickImage}
-                  />
+                  {image && (
+                    <Image
+                      source={{ uri: image }}
+                      style={{ width: 200, height: 200 }}
+                    />
+                  )}
+                  <TouchableOpacity
+                    onPress={handlePaymentProofButton}
+                    style={styles.updateButton}
+                  >
+                    <Text style={styles.buttonText}>Provide Payment Proof</Text>
+                  </TouchableOpacity>
                 </View>
-                {image && (
-                  <Image
-                    source={{ uri: image }}
-                    style={{ width: 200, height: 200 }}
-                  />
-                )}
-                <TouchableOpacity
-                  onPress={handlePaymentProofButton}
-                  style={styles.updateButton}
-                >
-                  <Text style={styles.buttonText}>Provide Payment Proof</Text>
-                </TouchableOpacity>
               </View>
-            </View>
-          )}
-          {user.uid == joinerId && approved && !collected && (
+            )}
+          {!cancelled && user.uid == joinerId && approved && !collected && (
             <TouchableOpacity
               onPress={handleCollectedButton}
               style={styles.updateButton}
@@ -932,5 +1020,12 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     marginRight: width * 0.05,
     fontSize: 16,
+  },
+  withdrawText: {
+    fontFamily: "raleway-regular",
+    textAlign: "center",
+    textDecorationLine: "underline",
+    color: "#404040",
+    margin: 0.015 * height,
   },
 });

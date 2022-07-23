@@ -61,10 +61,9 @@ const HomeScreen = () => {
             !joinedData.completed &&
             !joinedData.hidden
           ) {
-            if (joinedData.accepted) {
+            if (joinedData.approved) {
               getAcceptedListingIdsFromFirebase.push(joinedData.listingID);
-            }
-            if (joinedData.declinedReason != "") {
+            } else if (joinedData.declinedReason != "") {
               getDeclinedListingIdsFromFirebase.push(joinedData.listingID);
             } else {
               getPendingListingIdsFromFirebase.push(joinedData.listingID);
@@ -211,9 +210,7 @@ const HomeScreen = () => {
           ))}
         <Text style={styles.infoHeader}>Joined Listings</Text>
         {posts
-          .filter(
-            (post) => acceptedListingIds.includes(post.key) && !post.closed
-          )
+          .filter((post) => acceptedListingIds.includes(post.key))
           .map((post) => (
             <TouchableOpacity
               onPress={() =>
@@ -343,9 +340,7 @@ const HomeScreen = () => {
             </TouchableOpacity>
           ))}
         {posts
-          .filter(
-            (post) => pendingListingIds.includes(post.key) && !post.closed
-          )
+          .filter((post) => pendingListingIds.includes(post.key))
           .map((post) => (
             <TouchableOpacity
               onPress={() =>

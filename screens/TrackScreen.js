@@ -35,6 +35,7 @@ const TrackScreen = ({ route, navigation }) => {
   const [oldStatus, setOldStatus] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [closed, setClosed] = useState(false);
+  const [oldClosed, setOldClosed] = useState(false);
   const [readyForCollection, setReadyForCollection] = useState(false);
   const [readyForCollectionOld, setReadyForCollectionOld] = useState(false);
   const [joiners, setJoiners] = useState([]);
@@ -111,6 +112,20 @@ const TrackScreen = ({ route, navigation }) => {
       ]
     );
 
+  const handleConfirmClose = () =>
+    Alert.alert(
+      "Close Group Buy?",
+      "This action is irreversible. Please select only after all refunds and issues have been settled.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "Confirm", onPress: handleClose },
+      ]
+    );
+
   const handleConfirm = () => {
     setConfirmed(true);
     db.collection("listing")
@@ -134,7 +149,7 @@ const TrackScreen = ({ route, navigation }) => {
       .doc(listingId)
       .update({
         cancelled: true,
-        closed: true,
+        closed: false,
         acceptingOrders: false,
         status: "Group buy cancelled",
       })
@@ -142,6 +157,28 @@ const TrackScreen = ({ route, navigation }) => {
         Alert.alert(
           "Group buy cancelled.",
           "Please contact joiners to refund any payment made.",
+          [
+            {
+              text: "Ok",
+              style: "cancel",
+            },
+          ]
+        )
+      );
+  };
+
+  const handleClose = () => {
+    setClosed(true);
+    setOldClosed(true);
+    db.collection("listing")
+      .doc(listingId)
+      .update({
+        closed: true,
+      })
+      .then(() =>
+        Alert.alert(
+          "Group buy closed.",
+          "Group buy will no longer appear in Home Page.",
           [
             {
               text: "Ok",
@@ -179,6 +216,7 @@ const TrackScreen = ({ route, navigation }) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
         setOldStatus(listingData.status);
+        setOldClosed(listingData.closed);
         setReadyForCollectionOld(listingData.readyForCollection);
         setConfirmed(listingData.confirmed);
         setCancelled(listingData.cancelled);
@@ -205,7 +243,7 @@ const TrackScreen = ({ route, navigation }) => {
     };
   });
 
-  if (loadingJoinerInfo || loadingListingInfo) {
+  if (loadingListingInfo) {
     return (
       <View
         style={{
@@ -503,24 +541,46 @@ const TrackScreen = ({ route, navigation }) => {
                 </TouchableOpacity>
               </View>
             )}
-            {confirmed && (
+            {!oldClosed && confirmed && (
               <Text style={styles.confirmedText}>
                 {" "}
                 This group buy has been confirmed.{" "}
               </Text>
             )}
-            {cancelled && (
+            {!oldClosed && cancelled && (
               <Text style={styles.cancelledText}>
                 {" "}
                 This group buy has been cancelled.{" "}
               </Text>
             )}
-            <TouchableOpacity
-              onPress={handleConfirmUpdate}
-              style={styles.updateButton}
-            >
-              <Text style={styles.updatebuttonText}>Update status</Text>
-            </TouchableOpacity>
+            {oldClosed && confirmed && (
+              <Text style={styles.confirmedText}>
+                {" "}
+                This group buy is completed.{" "}
+              </Text>
+            )}
+            {oldClosed && cancelled && (
+              <Text style={styles.confirmedText}>
+                {" "}
+                This group buy is closed.{" "}
+              </Text>
+            )}
+            {!oldClosed && !cancelled && (
+              <TouchableOpacity
+                onPress={handleConfirmUpdate}
+                style={styles.updateButton}
+              >
+                <Text style={styles.updatebuttonText}>Update status</Text>
+              </TouchableOpacity>
+            )}
+            {!oldClosed && cancelled && (
+              <TouchableOpacity
+                onPress={handleConfirmClose}
+                style={styles.updateButton}
+              >
+                <Text style={styles.updatebuttonText}>Close listing</Text>
+              </TouchableOpacity>
+            )}
           </View>
           <View style={styles.buttonBottom}></View>
         </View>
