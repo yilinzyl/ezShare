@@ -84,26 +84,11 @@ const JoinListingScreen = ({ route, navigation }) => {
         contact: contact,
         address: address,
         collectionMethod: selectedCollection,
+        hidden: false,
       })
       .then(() => {
         console.log("Joined Data Added!");
         navigation.navigate("Explore");
-      });
-  };
-
-  const updateListingDatabase = () => {
-    db.collection("listing")
-      .doc(listingId)
-      .update({
-        currentAmount: parseFloat(currentAmount) + parseFloat(itemCost),
-        status:
-          parseFloat(currentAmount) + parseFloat(itemCost) >=
-          parseFloat(targetAmount)
-            ? "Accepting Orders - Target reached"
-            : status,
-      })
-      .then(() => {
-        console.log("Listing updated!");
       });
   };
 
@@ -147,7 +132,6 @@ const JoinListingScreen = ({ route, navigation }) => {
           if (nowErrorFields.length == 0) {
             setPosting(true);
             addToJoinedDatabase();
-            updateListingDatabase();
           }
         } else {
           nowErrorFields.push("itemLink");
@@ -162,7 +146,6 @@ const JoinListingScreen = ({ route, navigation }) => {
       if (nowErrorFields.length == 0) {
         setPosting(true);
         addToJoinedDatabase();
-        updateListingDatabase();
       }
     }
   };
