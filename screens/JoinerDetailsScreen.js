@@ -483,13 +483,18 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           )}
           <Text style={styles.infoHeader}>Item Name</Text>
           <Text style={styles.info}>{itemName}</Text>
-          <Text style={styles.infoHeader}>Item Link</Text>
-          <Text
-            style={styles.hyperlink}
-            onPress={() => handleOpenURL(itemLink)}
-          >
-            Click to open link
-          </Text>
+          {itemLink != "" && (
+            <View>
+              <Text style={styles.infoHeader}>Item Link</Text>
+
+              <Text
+                style={styles.hyperlink}
+                onPress={() => handleOpenURL(itemLink)}
+              >
+                Click to open link
+              </Text>
+            </View>
+          )}
           <Text style={styles.infoHeader}>Item Description</Text>
           <Text style={styles.info}>{itemDescription}</Text>
           <Text style={styles.infoHeader}>Item Cost</Text>
@@ -580,7 +585,7 @@ const JoinerDetailsScreen = ({ route, navigation }) => {
           {user.uid == listingUserId && !approved && !hasDeclined && (
             <View
               style={{
-                marginTop: height * 0.05,
+                marginTop: height * 0.02,
                 flexDirection: "row",
                 alignSelf: "center",
                 justifyContent: "space-around",
