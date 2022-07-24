@@ -228,7 +228,7 @@ const ViewListingScreen = ({ route, navigation }) => {
           <Text style={styles.info}>{cutOffDate.toString()}</Text>
           <Text style={styles.infoHeader}>Current / Target Amount</Text>
           <Text style={styles.info}>
-            {currentAmount} / {targetAmount} S$
+            S$ {currentAmount} / {targetAmount}
           </Text>
           <Text style={styles.infoHeader}>Delivery Fee</Text>
           <Text style={styles.info}>S$ {deliveryFee}</Text>

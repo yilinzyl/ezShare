@@ -178,7 +178,7 @@ const HomeScreen = () => {
                     </Text>
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {post.confirmed && (
+                    {post.confirmed && post.status != "Group buy cancelled" && (
                       <IconButton
                         icon="progress-check"
                         size={0.035 * width}
@@ -190,7 +190,20 @@ const HomeScreen = () => {
                         }}
                       />
                     )}
-                    {!post.confirmed && (
+                    {post.status == "Group buy cancelled" && (
+                      <IconButton
+                        icon="progress-alert"
+                        size={0.035 * width}
+                        color="red"
+                        style={{
+                          marginLeft: 0,
+                          marginRight: -0.005 * width,
+                          marginTop: -0.005 * width,
+                          marginBottom: -0.005 * width,
+                        }}
+                      />
+                    )}
+                    {!post.confirmed && post.status != "Group buy cancelled" && (
                       <IconButton
                         icon="progress-question"
                         size={0.035 * width}
@@ -202,7 +215,14 @@ const HomeScreen = () => {
                         }}
                       />
                     )}
-                    <Text style={styles.statusText}>{post.status}</Text>
+                    {post.status != "Group buy cancelled" && (
+                      <Text style={styles.statusText}>{post.status}</Text>
+                    )}
+                    {post.status == "Group buy cancelled" && (
+                      <Text style={[styles.statusText, { color: "red" }]}>
+                        {post.status}
+                      </Text>
+                    )}
                   </View>
                 </View>
               </View>

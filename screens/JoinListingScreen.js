@@ -164,10 +164,8 @@ const JoinListingScreen = ({ route, navigation }) => {
       .onSnapshot((documentSnapshot) => {
         const listingData = documentSnapshot.data();
         setListingName(listingData.listingName);
-        setTargetAmount(listingData.targetAmount);
         setOtherCosts(Number(listingData.otherCosts));
         setDeliveryFee(Number(listingData.deliveryFee));
-        setCurrentAmount(listingData.currentAmount);
         if (listingData.collectionPoint == "") {
           setSelectedCollection("Mailing");
           setCollectionMethods("Mailing");
@@ -177,7 +175,6 @@ const JoinListingScreen = ({ route, navigation }) => {
           setCollectionMethods("MeetUp");
         }
         setCollectionPoint(listingData.collectionPoint);
-        setStatus(listingData.status);
         setLoading(false);
       });
     return () => subscriber();
