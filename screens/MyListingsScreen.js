@@ -98,31 +98,31 @@ const MyListingsScreen = () => {
               >
                 <View key={post.listingName} style={styles.listing}>
                   {/* temporary image for testing purposes */}
-                  <Image source={logo} style={styles.appLogo} />
+                  {/* <Image source={logo} style={styles.appLogo} /> */}
                   <View style={styles.listingTextContainer}>
-                    {post.listingName.length <= 25 && (
+                    {post.listingName.length <= 50 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingName.length > 25 && (
+                    {post.listingName.length > 50 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 50)}
                         ...
                       </Text>
                     )}
-                    {post.listingDescription.length <= 30 && (
+                    {post.listingDescription.length <= 55 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingDescription.length > 30 && (
+                    {post.listingDescription.length > 55 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 55)}
                         ...
                       </Text>
                     )}
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   listingTextContainer: {
     marginLeft: 0.05 * width,
-    width: 0.6 * width,
+    width: 0.85 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",

@@ -219,31 +219,31 @@ const ExploreScreen = () => {
                   {/* {!post.imagePresent && (
                     <Image source={logo} style={styles.appLogo} />
                   )} */}
-                  <Image source={logo} style={styles.appLogo} />
+                  {/* <Image source={logo} style={styles.appLogo} /> */}
                   <View style={styles.listingTextContainer}>
-                    {post.listingName.length <= 25 && (
+                    {post.listingName.length <= 50 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingName.length > 25 && (
+                    {post.listingName.length > 50 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 50)}
                         ...
                       </Text>
                     )}
-                    {post.listingDescription.length <= 30 && (
+                    {post.listingDescription.length <= 60 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingDescription.length > 30 && (
+                    {post.listingDescription.length > 60 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 50)}
                         ...
                       </Text>
                     )}
@@ -466,8 +466,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listingTextContainer: {
-    marginLeft: 0.05 * width,
-    width: 0.6 * width,
+    //marginLeft: 0.05 * width,
+    width: 0.78 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",
