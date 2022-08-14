@@ -115,7 +115,11 @@ const HomeScreen = () => {
           onPress={() => navigation.navigate("Create Listing")}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>Create New</Text>
+                              <IconButton
+                      icon="plus-thick"
+                      size={0.08 * width}
+                      color='white'
+                      />
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.listingContainer}>
@@ -662,8 +666,8 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#F898A3",
     height: width * 0.125,
-    width: width * 0.4,
-    borderRadius: 45,
+    width: width * 0.125,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -714,7 +718,7 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.012,
   },
   listingContainer: {
-    height: height * 0.67,
+    height: height * 0.7,
     backgroundColor: "#f9fafe",
   },
   listing: {

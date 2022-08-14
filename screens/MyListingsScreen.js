@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     width: height * 0.13,
   },
   listingContainer: {
-    height: height * 0.48,
+    height: height * 0.51,
     backgroundColor: "#F9FAFE",
   },
   listing: {

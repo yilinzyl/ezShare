@@ -121,7 +121,10 @@ const UserSearchScreen = () => {
               </TouchableOpacity>
             ))
         ) : (
-          <Text>no posts yet</Text>
+            <Text style={{    fontFamily: "raleway-regular",
+            fontSize: (30 * width) / height,
+            marginLeft: 0.1 * width,
+            }}>no posts yet</Text>
         )}
       </ScrollView>
       <View style={styles.footer}>
