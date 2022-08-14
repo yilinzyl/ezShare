@@ -9,7 +9,7 @@ import {
   Image,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import logo from "../assets/default-listing-icon.png";
@@ -26,6 +26,9 @@ const MyListingsScreen = () => {
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [imageUrls, setImageUrls] = useState({});
+  const [reload, setReload] = useState(0);
+
   const handleSignOut = () => {
     auth
       .signOut()
@@ -43,17 +46,27 @@ const MyListingsScreen = () => {
     const getPostsFromFirebase = [];
     const subscriber = db.collection("listing").onSnapshot((querySnapshot) => {
       querySnapshot.forEach((doc) => {
+        if (doc.data().user == user.uid) {
         getPostsFromFirebase.push({
           ...doc.data(),
           key: doc.id,
         });
-      });
+        if (doc.data().imagePresent) {getImageUrl(doc.id);};
+      }});
       setPosts(getPostsFromFirebase);
       setLoading(false);
     });
 
     return () => subscriber();
   }, []);
+
+  const getImageUrl = async (listingId) => {
+    const result = await cloudStorage
+           .ref("listingImages/" + listingId + ".jpg")
+           .getDownloadURL();
+    imageUrls[listingId] = result; 
+    setReload(Math.random)
+  }
 
   return (
     <View style={styles.background}>
@@ -98,31 +111,32 @@ const MyListingsScreen = () => {
               >
                 <View key={post.listingName} style={styles.listing}>
                   {/* temporary image for testing purposes */}
-                  {/* <Image source={logo} style={styles.appLogo} /> */}
+                  {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                   <View style={styles.listingTextContainer}>
-                    {post.listingName.length <= 50 && (
+                    {post.listingName.length <= 25 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingName.length > 50 && (
+                    {post.listingName.length > 25 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 50)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
-                    {post.listingDescription.length <= 55 && (
+                    {post.listingDescription.length <= 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingDescription.length > 55 && (
+                    {post.listingDescription.length > 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 55)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
@@ -274,7 +288,7 @@ const styles = StyleSheet.create({
   },
   listingTextContainer: {
     marginLeft: 0.05 * width,
-    width: 0.85 * width,
+    width: 0.6 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",

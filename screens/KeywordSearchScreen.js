@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
@@ -29,7 +29,8 @@ const KeywordSearchScreen = () => {
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [keyword, setKeyword] = useState("....");
-  const word = "Cherries";
+  const [imageUrls, setImageUrls] = useState({});
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     const getPostsFromFirebase = [];
@@ -39,12 +40,21 @@ const KeywordSearchScreen = () => {
           ...doc.data(),
           key: doc.id,
         });
+        if (doc.data().imagePresent) {getImageUrl(doc.id);};
       });
       setPosts(getPostsFromFirebase);
-      setLoading(false);
+      setLoading(false); 
     });
     return () => subscriber();
   }, []);
+
+  const getImageUrl = async (listingId) => {
+    const result = await cloudStorage
+           .ref("listingImages/" + listingId + ".jpg")
+           .getDownloadURL();
+    imageUrls[listingId] = result; 
+    setReload(Math.random)
+  }
 
   if (loading) {
     return (
@@ -116,7 +126,9 @@ const KeywordSearchScreen = () => {
               >
                 <View key={post.user + post.listDate} style={styles.listing}>
                   {/* temporary image for testing purposes */}
-                  <Image source={logo} style={styles.appLogo} />
+                  {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
+                  {/* <Image source={logo} style={styles.appLogo} /> */}
                   <View style={styles.listingTextContainer}>
                     {post.listingName.length <= 25 && (
                       <Text style={styles.listingTitle}>
@@ -127,20 +139,20 @@ const KeywordSearchScreen = () => {
                       <Text style={styles.listingTitle}>
                         {post.listingName
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
-                    {post.listingDescription.length <= 30 && (
+                    {post.listingDescription.length <= 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingDescription.length > 30 && (
+                    {post.listingDescription.length > 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 30)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
