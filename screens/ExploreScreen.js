@@ -29,7 +29,8 @@ const ExploreScreen = () => {
   const [posts, setPosts] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState("Find something that interests you");
-  const [images, setImages] = useState({});
+  const [imageUrls, setImageUrls] = useState({});
+  const [reload, setReload] = useState(0);
 
   const getImage = (listingId) => {
     return cloudStorage
@@ -44,7 +45,9 @@ const ExploreScreen = () => {
         getPostsFromFirebase.push({
           ...doc.data(),
           key: doc.id,
+          
         });
+        if (doc.data().imagePresent) {getImageUrl(doc.id);};
       });
       setPosts(getPostsFromFirebase);
       setLoading(false);
@@ -52,76 +55,13 @@ const ExploreScreen = () => {
     return () => subscriber();
   }, []);
 
-  useEffect(() => {
-    const getImagesFromFirebase = {};
-    let numImages = 0;
-    let currImages = 0;
-    if (!loading) {
-      posts.forEach((doc) => {
-        if (doc.imagePresent) {
-          numImages++;
-          getImage(doc.key)
-            .then((uid) => {
-              currImages++;
-              getImagesFromFirebase[doc.key] = uid;
-              console.log("done");
-              if (numImages == currImages) {
-                setImages(getImagesFromFirebase);
-              }
-            })
-            .catch((e) => {
-              currImages++;
-              getImagesFromFirebase[doc.key] =
-                Image.resolveAssetSource(logo).uri;
-              console.log("error");
-              if (numImages == currImages) {
-                console.log(getImagesFromFirebase);
-                setImages(getImagesFromFirebase);
-                console.log(images);
-              }
-            });
-        }
-      });
-    }
-  }, []);
-
-  // useEffect(() => {
-  //   const getImagesFromFirebase = {};
-  //   let numImages = 0;
-  //   let currImages = 0;
-
-  //   const getImage = async (listingId) => {
-  //     // try {
-  //     console.log("defined");
-  //     const uid = await cloudStorage
-  //       .ref("listingImages/" + listingId + ".jpg")
-  //       .getDownloadURL();
-  //     getImagesFromFirebase[listingId] = uid;
-  //     console.log(uid);
-  //     currImages++;
-  //     if (numImages == currImages) {
-  //       console.log(getImagesFromFirebase);
-  //       setImages(getImagesFromFirebase);
-  //       console.log(images);
-  //     }
-  //     // } catch (err) {
-  //     //   getImagesFromFirebase[listingId] = Image.resolveAssetSource(logo).uri;
-  //     //   currImages++;
-  //     //   if (numImages == currImages) {
-  //     //     console.log(getImagesFromFirebase);
-  //     //     setImages(getImagesFromFirebase);
-  //     //     console.log(images);
-  //     //   }
-  //     // }
-  //   };
-
-  //   if (!loading) {
-  //     posts.forEach((doc) => {
-  //       getImage(doc.key);
-  //       numImages++;
-  //     });
-  //   }
-  // }, []);
+  const getImageUrl = async (listingId) => {
+    const result = await cloudStorage
+           .ref("listingImages/" + listingId + ".jpg")
+           .getDownloadURL();
+    imageUrls[listingId] = result; 
+    setReload(Math.random)
+  }
 
   const handleFood = () => setCategory("Food");
   const handleFashion = () => setCategory("Fashion");
@@ -218,40 +158,33 @@ const ExploreScreen = () => {
               >
                 <View key={post.user + post.listDate} style={styles.listing}>
                   {/* temporary image for testing purposes */}
-                  {/* {post.imagePresent && (
-                    <Image
-                      source={{ uri: images[post.key] }}
-                      style={styles.appLogo}
-                    />
-                  )} */}
-                  {/* {!post.imagePresent && (
-                    <Image source={logo} style={styles.appLogo} />
-                  )} */}
+                  {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                   {/* <Image source={logo} style={styles.appLogo} /> */}
                   <View style={styles.listingTextContainer}>
-                    {post.listingName.length <= 50 && (
+                    {post.listingName.length <= 25 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingName.length > 50 && (
+                    {post.listingName.length > 25 && (
                       <Text style={styles.listingTitle}>
                         {post.listingName
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 50)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
-                    {post.listingDescription.length <= 60 && (
+                    {post.listingDescription.length <= 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                       </Text>
                     )}
-                    {post.listingDescription.length > 60 && (
+                    {post.listingDescription.length > 25 && (
                       <Text style={styles.listingText}>
                         {post.listingDescription
                           .replace(/(\r\n|\n|\r)/gm, " ")
-                          .slice(0, 50)}
+                          .slice(0, 23)}
                         ...
                       </Text>
                     )}
@@ -482,8 +415,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listingTextContainer: {
-    //marginLeft: 0.05 * width,
-    width: 0.78 * width,
+    marginLeft: 0.05 * width,
+    width: 0.6 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",

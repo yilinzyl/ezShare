@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth, db, cloudStorage } from "../firebase";
 import { NavigationContainer } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/core";
 import { IconButton } from "react-native-paper";
@@ -29,10 +29,11 @@ const HomeScreen = () => {
   const [loadingListings, setLoadingListings] = useState(true);
   const [loadingJoiners, setLoadingJoiners] = useState(true);
   const [posts, setPosts] = useState([]);
-
+  const [imageUrls, setImageUrls] = useState({});
   const [acceptedListingIds, setAcceptedListingIds] = useState([]);
   const [declinedListingIds, setDeclinedListingIds] = useState([]);
   const [pendingListingIds, setPendingListingIds] = useState([]);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     const getPostsFromFirebase = [];
@@ -44,6 +45,7 @@ const HomeScreen = () => {
             ...doc.data(),
             key: doc.id,
           });
+          if (doc.data().imagePresent && doc.data().user == user.uid) {getImageUrl(doc.id);};
         });
         setPosts(getPostsFromFirebase);
         setLoadingListings(false);
@@ -63,10 +65,13 @@ const HomeScreen = () => {
           ) {
             if (joinedData.approved) {
               getAcceptedListingIdsFromFirebase.push(joinedData.listingID);
+              getImageUrl(joinedData.listingID)
             } else if (joinedData.declinedReason != "") {
               getDeclinedListingIdsFromFirebase.push(joinedData.listingID);
+              getImageUrl(joinedData.listingID)
             } else {
               getPendingListingIdsFromFirebase.push(joinedData.listingID);
+              getImageUrl(joinedData.listingID)
             }
           }
         });
@@ -80,6 +85,18 @@ const HomeScreen = () => {
       subscriberPosts();
     };
   }, []);
+
+  const getImageUrl = async (listingId) => {
+    try{
+    const result = await cloudStorage
+           .ref("listingImages/" + listingId + ".jpg")
+           .getDownloadURL();
+    imageUrls[listingId] = result; 
+    setReload(Math.random)}
+    catch{
+      console.log('no pic')
+    }
+  }
 
   if (loadingListings || loadingJoiners) {
     return (
@@ -134,31 +151,32 @@ const HomeScreen = () => {
             >
               <View key={post.user + post.listDate} style={styles.listing}>
                 {/* temporary image for testing purposes */}
-                {/* <Image source={logo} style={styles.appLogo} /> */}
+                {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                 <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 50 && (
+                  {post.listingName.length <= 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingName.length > 50 && (
+                  {post.listingName.length > 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 50)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
-                  {post.listingDescription.length <= 60 && (
+                  {post.listingDescription.length <= 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingDescription.length > 60 && (
+                  {post.listingDescription.length > 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 60)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
@@ -243,31 +261,32 @@ const HomeScreen = () => {
             >
               <View key={post.listingDate + post.user} style={styles.listing}>
                 {/* temporary image for testing purposes */}
-                {/* <Image source={logo} style={styles.appLogo} /> */}
+                {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                 <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 50 && (
+                  {post.listingName.length <= 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingName.length > 50 && (
+                  {post.listingName.length > 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 50)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
-                  {post.listingDescription.length <= 60 && (
+                  {post.listingDescription.length <= 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingDescription.length > 60 && (
+                  {post.listingDescription.length > 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 60)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
@@ -373,31 +392,32 @@ const HomeScreen = () => {
             >
               <View key={post.listingDate + post.user} style={styles.listing}>
                 {/* temporary image for testing purposes */}
-                {/* <Image source={logo} style={styles.appLogo} /> */}
+                {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                 <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 50 && (
+                  {post.listingName.length <= 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingName.length > 50 && (
+                  {post.listingName.length > 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 50)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
-                  {post.listingDescription.length <= 60 && (
+                  {post.listingDescription.length <= 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingDescription.length > 60 && (
+                  {post.listingDescription.length > 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 60)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
@@ -503,31 +523,32 @@ const HomeScreen = () => {
             >
               <View key={post.listingDate + post.user} style={styles.listing}>
                 {/* temporary image for testing purposes */}
-                {/* <Image source={logo} style={styles.appLogo} /> */}
+                {typeof imageUrls[post.key] === 'undefined' && <Image source={logo} style={styles.appLogo} />}
+                  {typeof imageUrls[post.key] !== 'undefined' && post.imagePresent && <Image source={{uri: imageUrls[post.key]}} style={styles.appLogo} />}
                 <View style={styles.listingTextContainer}>
-                  {post.listingName.length <= 50 && (
+                  {post.listingName.length <= 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingName.length > 50 && (
+                  {post.listingName.length > 25 && (
                     <Text style={styles.listingTitle}>
                       {post.listingName
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 50)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
-                  {post.listingDescription.length <= 60 && (
+                  {post.listingDescription.length <= 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription.replace(/(\r\n|\n|\r)/gm, " ")}
                     </Text>
                   )}
-                  {post.listingDescription.length > 60 && (
+                  {post.listingDescription.length > 25 && (
                     <Text style={styles.listingText}>
                       {post.listingDescription
                         .replace(/(\r\n|\n|\r)/gm, " ")
-                        .slice(0, 60)}
+                        .slice(0, 23)}
                       ...
                     </Text>
                   )}
@@ -732,8 +753,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listingTextContainer: {
-    //marginLeft: 0.05 * width,
-    width: 0.85 * width,
+    marginLeft: 0.05 * width,
+    width: 0.6 * width,
   },
   listingTitle: {
     fontFamily: "raleway-bold",
