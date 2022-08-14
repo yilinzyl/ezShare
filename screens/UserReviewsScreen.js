@@ -54,28 +54,6 @@ const UserReviewScreen = ({ route, navigation }) => {
     };
   }, ["userId"]);
 
-  if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignContent: "center",
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "raleway-bold",
-            color: "#b8c4fc",
-            fontSize: (50 * width) / height,
-            textAlign: "center",
-          }}
-        >
-          Loading...
-        </Text>
-      </View>
-    );
-  } else {
     return (
       <View style={styles.background}>
         <View style={styles.headerContainer}>
@@ -175,7 +153,6 @@ const UserReviewScreen = ({ route, navigation }) => {
           ))}
       </View>
     );
-  }
 };
 
 export default UserReviewScreen;
