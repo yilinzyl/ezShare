@@ -130,7 +130,7 @@ const RegisterScreen = () => {
               onPress={handleExistingUser}
               style={styles.existingUserButton}
             >
-              <Text style={styles.existingUserText}>I am an existing User</Text>
+              <Text style={[styles.existingUserText,{textDecorationLine: 'underline',}]}>I am an existing User</Text>
             </TouchableOpacity>
           </View>
         </View>
