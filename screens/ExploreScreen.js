@@ -135,18 +135,26 @@ const ExploreScreen = () => {
       <View style={styles.headerContainer}>
         <View style={styles.headerContainerHorizontal}>
           <Text style={styles.header}>Explore</Text>
-          <View>
+          <View style={{flexDirection:"row"}}>
             <TouchableOpacity
               onPress={() => navigation.navigate("Keyword")}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>Search by Keyword</Text>
+                                            <IconButton
+                      icon="text-search"
+                      size={0.08 * width}
+                      color='white'
+                      />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("User Search")}
               style={styles.button}
             >
-              <Text style={styles.buttonText}>Search by User</Text>
+                                                         <IconButton
+                      icon="account-search-outline"
+                      size={0.08 * width}
+                      color='white'
+                      />
             </TouchableOpacity>
           </View>
         </View>
@@ -320,7 +328,10 @@ const ExploreScreen = () => {
               </TouchableOpacity>
             ))
         ) : (
-          <Text>no posts yet</Text>
+          <Text style={{    fontFamily: "raleway-regular",
+          fontSize: (30 * width) / height,
+          marginLeft: 0.1 * width,
+          }}>no posts yet</Text>
         )}
         <View style={styles.endPageContainer}>
           <Text style={styles.endPageText}>
@@ -331,7 +342,11 @@ const ExploreScreen = () => {
             onPress={() => navigation.navigate("Create Listing")}
             style={styles.createButton}
           >
-            <Text style={styles.buttonText}>Create Listing</Text>
+                                          <IconButton
+                      icon="plus-thick"
+                      size={0.08 * width}
+                      color='white'
+                      />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -373,18 +388,19 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#b0c0f9",
-    height: 45,
-    width: width * 0.4,
-    borderRadius: 45,
+    height: width * 0.125,
+    width: width * 0.125,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     marginVertical: height * 0.005,
+    marginLeft: width*0.02
   },
   createButton: {
     backgroundColor: "#F898A3",
-    height: 50,
-    width: width * 0.33,
-    borderRadius: 45,
+    height: width * 0.125,
+    width: width * 0.125,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     margin: 20,
