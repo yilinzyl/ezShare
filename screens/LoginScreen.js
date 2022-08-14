@@ -103,7 +103,8 @@ const LoginScreen = () => {
               style={styles.registerButton}
             >
               <Text style={styles.registerText}>
-                Not a user yet? Create a new account.
+                Not a user yet?{" "}
+                <Text style={[styles.registerText,{textDecorationLine: 'underline',}]}>Create a new account.</Text>
               </Text>
             </TouchableOpacity>
           </View>
