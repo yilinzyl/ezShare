@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.012,
   },
   listingContainer: {
-    height: height * 0.67,
+    height: height * 0.7,
     backgroundColor: "#f9fafe",
   },
   listing: {

@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
     fontSize: (70 * width) / height,
   },
   listingContainer: {
-    height: height * 0.61,
+    height: height * 0.64,
     backgroundColor: "#f9fafe",
   },
   listing: {
