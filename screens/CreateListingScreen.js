@@ -472,6 +472,7 @@ const CreateListingScreen = () => {
               borderColor: errorFields.includes("collectionMethods")
                 ? "red"
                 : "#B0C0F9",
+                zIndex: 2000,
             },
           ]}
           dropDownContainerStyle={styles.dropdownContainer}

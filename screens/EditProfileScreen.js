@@ -32,6 +32,7 @@ const EditProfileScreen = () => {
   const [email, setEmail] = useState(user.email);
   const [posts, setPosts] = useState([]);
   const [listingIds, setlistingIds] = useState([]);
+  const [reviewIds, setReviewIds] = useState([]);
 
   useEffect(() => {
     const getPostsFromFirebase = [];
@@ -40,7 +41,7 @@ const EditProfileScreen = () => {
       .onSnapshot((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           getPostsFromFirebase.push({
-            ...doc.data(),
+            userID: doc.data().user,
             key: doc.id,
           });
         });
@@ -52,15 +53,28 @@ const EditProfileScreen = () => {
       .onSnapshot((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           getListingIdsFromFirebase.push({
-            ...doc.data(),
+            userID: doc.data().userID,
             key: doc.id,
           });
         });
         setlistingIds(getListingIdsFromFirebase);
       });
+      const getReviewIdsFromFirebase = [];
+      const subscriberReviews = db
+        .collection("reviews")
+        .onSnapshot((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            getReviewIdsFromFirebase.push({
+              userID: doc.data().from,
+              key: doc.id,
+            });
+          });
+          setReviewIds(getReviewIdsFromFirebase);
+        });
     return () => {
       subscriberListings();
       subscriberPosts();
+      subscriberReviews();
     };
   }, []);
 
@@ -90,7 +104,7 @@ const EditProfileScreen = () => {
       )
       .then(
         posts
-          .filter((post) => post.user == user.uid)
+          .filter((post) => post.userID == user.uid)
           .map((post) =>
             db.collection("listing").doc(post.key).update({ username: name })
           )
@@ -100,6 +114,13 @@ const EditProfileScreen = () => {
           .filter((post) => post.userID == user.uid)
           .map((post) =>
             db.collection("joined").doc(post.key).update({ username: name })
+          )
+      )
+      .then(
+        reviewIds
+          .filter((post) => post.userID == user.uid)
+          .map((post) =>
+            db.collection("reviews").doc(post.key).update({ fromName: name })
           )
       )
       .then(() => navigation.navigate("Profile"));
